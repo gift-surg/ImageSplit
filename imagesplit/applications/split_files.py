@@ -149,7 +149,7 @@ def parse_slice_output(dim_order, max_block_size_voxels, overlap_size_voxels,
             max_block_size_voxels[abs(dim_order[2]) - 1] = 1
             overlap_size_voxels = [0, 0, 0]
         else:
-            raise ValueError("Unkown slice parameter " + slice_output)
+            raise ValueError("Unknown slice parameter " + slice_output)
     return new_dim_order, max_block_size_voxels, overlap_size_voxels
 
 

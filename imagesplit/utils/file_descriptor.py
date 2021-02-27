@@ -409,7 +409,7 @@ def convert_to_dict(descriptors):
 
 
 def parse_header(filename, factory):
-    """Read metadata from any suported header type"""
+    """Read metadata from any supported header type"""
 
     # pylint: disable=unused-variable
     header_base, extension = os.path.splitext(filename)
