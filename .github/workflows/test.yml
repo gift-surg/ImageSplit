@@ -57,6 +57,31 @@ jobs:
           pip install ${wheel_path}
           imagesplit --help
 
+  test-pyinstaller:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macOS-latest, windows-latest]
+        python-ver: [3.6, 3.7, 3.8, 3.9]
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+
+      - name: Install pyinstaller
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyinstaller
+
+      - name: Test pyinstaller
+        run: |
+          pyinstaller --onefile imagesplit.py --noconfirm --windowed
+
   lint:
     runs-on: ubuntu-latest
     steps:
