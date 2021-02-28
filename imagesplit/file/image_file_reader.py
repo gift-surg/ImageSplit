@@ -129,7 +129,9 @@ class BlockImageFileReader(ImageFileReader):
     def read_image(self, start_local, size_local):
         """Read the specified part of the image"""
 
-        image_data = ImageStorage.from_raw_image(self.load(), self.size)
+        image_data_raw = self.load()
+
+        image_data = ImageStorage.from_raw_image(image_data_raw, self.size)
         if image_data.get_size() != self.size:
             raise ValueError("Image is not the expected size")
 

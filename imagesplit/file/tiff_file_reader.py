@@ -6,6 +6,7 @@ import numpy as np
 from PIL import Image, TiffImagePlugin
 
 from imagesplit.file.data_type import DataType
+from imagesplit.file.file_image_descriptor import FileImageDescriptor
 from imagesplit.file.image_file_reader import BlockImageFileReader
 
 
@@ -20,10 +21,17 @@ class TiffFileReader(BlockImageFileReader):
     def close_file(self):
         """Closes file if required"""
 
+    def close(self):
+        """Closes file if required"""
+
     def load(self):
         """Load image data from TIFF file"""
-        if not self.cached_image:
+        if self.cached_image is None:
             img = Image.open(self.filename)
+            if self.data_type.is_rgb:
+                print("Warning: ImageSplit currently does not support RGB "
+                      "input. Converting to grayscale.")
+                img = img.convert('L')
             self.cached_image = np.array(img)
         return self.cached_image
 
@@ -77,3 +85,47 @@ class TiffFileReader(BlockImageFileReader):
         """Adds a suffix to to the filename before the extension"""
         name, ext = os.path.splitext(filename)
         return "{name}_{suffix}{ext}".format(name=name, suffix=suffix, ext=ext)
+
+    @classmethod
+    def load_and_parse_header(cls, filename):
+        """Reads a TIFF header file and parses"""
+
+        img = Image.open(filename)
+        descriptor = parse_tiff(img)
+        img.close()
+        return descriptor
+
+    @classmethod
+    def create_read_file(cls, subimage_descriptor, file_handle_factory):
+        """Create a TIFF class for file access"""
+
+        filename = subimage_descriptor.filename
+        local_file_size = subimage_descriptor.get_local_size()
+        byte_order_msb = subimage_descriptor.msb
+        compression = subimage_descriptor.compression
+        data_type = DataType(subimage_descriptor.data_type,
+                             byte_order_msb=byte_order_msb,
+                             compression=compression)
+        return cls(filename=filename, image_size=local_file_size,
+                   data_type=data_type)
+
+
+def parse_tiff(image):
+    """Read a metaheader and returns a FileImageDescriptor"""
+
+    file_format = "tiff"
+    dim_order = [1, 2, 3]
+    data_type = DataType.name_from_tiff(image.mode)
+    image_size = [image.height, image.width, 1]
+    msb = True
+    compression = image.info["compression"]
+    dpi = image.info['dpi']
+    voxel_size = [25.4/dpi[1], 25.4/dpi[0], 25.4/dpi[0]]
+    header = {}
+    return (FileImageDescriptor(file_format=file_format,
+                                dim_order=dim_order,
+                                data_type=data_type,
+                                image_size=image_size,
+                                msb=msb,
+                                compression=compression,
+                                voxel_size=voxel_size), header)

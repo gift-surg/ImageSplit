@@ -15,9 +15,11 @@ class DataTypeTemplate(object):
                  bytes_per_voxel,
                  numpy_base=None,
                  metaio_type=None,
+                 pil_type=None,
                  vge_type=None,
                  is_rgb=False):
         self.numpy_base = numpy_base
+        self.pil_type = pil_type
         self.vge_type = vge_type
         self.bytes_per_voxel = bytes_per_voxel
         self.metaio_type = metaio_type
@@ -43,6 +45,7 @@ class DataType(object):
     types = {
         RGB_TYPE: DataTypeTemplate(metaio_type='MET_UCHAR',
                                    numpy_base='u1',
+                                   pil_type='RGB',
                                    bytes_per_voxel=1,
                                    is_rgb=True),
         CHAR_TYPE: DataTypeTemplate(metaio_type='MET_CHAR',
@@ -50,6 +53,7 @@ class DataType(object):
                                     bytes_per_voxel=1),
         UCHAR_TYPE: DataTypeTemplate(metaio_type='MET_UCHAR',
                                      numpy_base='u1',
+                                     pil_type='L',
                                      bytes_per_voxel=1),
         SHORT_TYPE: DataTypeTemplate(metaio_type='MET_SHORT',
                                      numpy_base='i2',
@@ -59,6 +63,7 @@ class DataType(object):
                                       bytes_per_voxel=2),
         LONG_TYPE: DataTypeTemplate(metaio_type='MET_LONG',
                                     numpy_base='i4',
+                                    pil_type='I',
                                     vge_type='VolumeDataType_Float',
                                     bytes_per_voxel=4),
         ULONG_TYPE: DataTypeTemplate(metaio_type='MET_ULONG',
@@ -72,6 +77,7 @@ class DataType(object):
                                           bytes_per_voxel=8),
         FLOAT_TYPE: DataTypeTemplate(metaio_type='MET_FLOAT',
                                      numpy_base='f4',
+                                     pil_type='F',
                                      bytes_per_voxel=4),
         DOUBLE_TYPE: DataTypeTemplate(metaio_type='MET_DOUBLE',
                                       numpy_base='f8',
@@ -112,6 +118,16 @@ class DataType(object):
         raise ValueError("Unknown type: " + metaio_type_name)
 
     @classmethod
+    def from_tiff(cls, tiff_type_name, byte_order_msb):
+        """Create a DataType from a TIFF data type string"""
+        for name, data_type in cls.types.items():
+            if data_type.tiff_type_name == tiff_type_name:
+                return name
+                return cls(template_name=name,
+                           byte_order_msb=byte_order_msb)
+        raise ValueError("Unknown type: " + tiff_type_name)
+
+    @classmethod
     def from_vge(cls, vge_type_name):
         """Create a DataType from a vge header data type string"""
         for name, data_type in cls.types.items():
@@ -128,6 +144,15 @@ class DataType(object):
                 return name
 
         raise ValueError("Unknown type: " + metaio_type_name)
+
+    @classmethod
+    def name_from_tiff(cls, tiff_type_name):
+        """Get a DataType string from a TIFF data type string"""
+        for name, data_type in cls.types.items():
+            if data_type.pil_type == tiff_type_name:
+                return name
+
+        raise ValueError("Unsupported type: " + tiff_type_name)
 
     @classmethod
     def metaio_from_name(cls, name):
