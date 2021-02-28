@@ -121,8 +121,7 @@ class DataType(object):
     def from_tiff(cls, tiff_type_name, byte_order_msb):
         """Create a DataType from a TIFF data type string"""
         for name, data_type in cls.types.items():
-            if data_type.tiff_type_name == tiff_type_name:
-                return name
+            if data_type.pil_type == tiff_type_name:
                 return cls(template_name=name,
                            byte_order_msb=byte_order_msb)
         raise ValueError("Unknown type: " + tiff_type_name)
