@@ -15,3 +15,4 @@ imagesplit/info.py
 .tox
 .cache
 .coverage
+local_testing
