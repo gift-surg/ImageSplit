@@ -96,7 +96,7 @@ class TiffFileReader(BlockImageFileReader):
         return descriptor
 
     @classmethod
-    def create_read_file(cls, subimage_descriptor, file_handle_factory):
+    def create_read_file(cls, subimage_descriptor, file_handle_factory):  # pylint:disable=unused-argument
         """Create a TIFF class for file access"""
 
         filename = subimage_descriptor.filename
