@@ -1,6 +1,6 @@
 # coding=utf-8
 """
-Utility for reading and writing data to metaio (mhd/mha) files
+Utility for reading and writing data to vol  files
 
 Author: Tom Doel
 Copyright UCL 2017
@@ -17,8 +17,7 @@ from imagesplit.file.image_file_reader import LinearImageFileReader
 
 
 class VolFile(LinearImageFileReader):
-    """A class for reading or writing 3D imaging data to/from a MetaIO file
-    pair (.mhd and .raw). """
+    """A class for reading or writing 3D imaging data from vge/vol file pair"""
 
     # pylint: disable=too-many-instance-attributes
 
@@ -150,8 +149,6 @@ def load_vge_header(filename):
 
     header = configparser.ConfigParser()
     header.read(filename)
-
-    # for section in header.sections():
 
     header_dict = {s: dict(header.items(s)) for s in header.sections()}
 
