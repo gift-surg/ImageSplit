@@ -57,24 +57,6 @@ jobs:
           pip install ${wheel_path}
           imagesplit --help
 
-    steps:
-      - name: Check out code
-        uses: actions/checkout@v2
-
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.8
-
-      - name: Install pyinstaller
-        run: |
-          python -m pip install --upgrade pip
-          pip install pyinstaller
-
-      - name: Test pyinstaller
-        run: |
-          pyinstaller --onefile imagesplit.py --noconfirm --windowed
-
   lint:
     runs-on: ubuntu-latest
     steps:
