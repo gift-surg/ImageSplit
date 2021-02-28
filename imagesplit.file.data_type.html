@@ -108,6 +108,12 @@ Copyright UCL 2017</p>
 </dd></dl>
 
 <dl class="py method">
+<dt id="imagesplit.file.data_type.DataType.from_tiff">
+<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">from_tiff</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tiff_type_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">byte_order_msb</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/file/data_type.html#DataType.from_tiff"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.file.data_type.DataType.from_tiff" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a DataType from a TIFF data type string</p>
+</dd></dl>
+
+<dl class="py method">
 <dt id="imagesplit.file.data_type.DataType.from_vge">
 <em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">from_vge</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vge_type_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/file/data_type.html#DataType.from_vge"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.file.data_type.DataType.from_vge" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a DataType from a vge header data type string</p>
@@ -144,6 +150,12 @@ Copyright UCL 2017</p>
 </dd></dl>
 
 <dl class="py method">
+<dt id="imagesplit.file.data_type.DataType.name_from_tiff">
+<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">name_from_tiff</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tiff_type_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/file/data_type.html#DataType.name_from_tiff"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.file.data_type.DataType.name_from_tiff" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a DataType string from a TIFF data type string</p>
+</dd></dl>
+
+<dl class="py method">
 <dt id="imagesplit.file.data_type.DataType.name_from_vge">
 <em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">name_from_vge</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vge_type_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/file/data_type.html#DataType.name_from_vge"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.file.data_type.DataType.name_from_vge" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get a DataType string from a vge data type string</p>
@@ -158,7 +170,7 @@ Copyright UCL 2017</p>
 
 <dl class="py class">
 <dt id="imagesplit.file.data_type.DataTypeTemplate">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">imagesplit.file.data_type.</span></code><code class="sig-name descname"><span class="pre">DataTypeTemplate</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bytes_per_voxel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">numpy_base</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metaio_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vge_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_rgb</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/file/data_type.html#DataTypeTemplate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.file.data_type.DataTypeTemplate" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">imagesplit.file.data_type.</span></code><code class="sig-name descname"><span class="pre">DataTypeTemplate</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bytes_per_voxel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">numpy_base</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metaio_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pil_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vge_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_rgb</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/file/data_type.html#DataTypeTemplate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.file.data_type.DataTypeTemplate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Data format paramaters for standard data types</p>
 </dd></dl>

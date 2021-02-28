@@ -55,9 +55,11 @@
                  <span class="n">bytes_per_voxel</span><span class="p">,</span>
                  <span class="n">numpy_base</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">metaio_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">pil_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">vge_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">is_rgb</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">numpy_base</span> <span class="o">=</span> <span class="n">numpy_base</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pil_type</span> <span class="o">=</span> <span class="n">pil_type</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">vge_type</span> <span class="o">=</span> <span class="n">vge_type</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">bytes_per_voxel</span> <span class="o">=</span> <span class="n">bytes_per_voxel</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">metaio_type</span> <span class="o">=</span> <span class="n">metaio_type</span>
@@ -83,6 +85,7 @@
     <span class="n">types</span> <span class="o">=</span> <span class="p">{</span>
         <span class="n">RGB_TYPE</span><span class="p">:</span> <span class="n">DataTypeTemplate</span><span class="p">(</span><span class="n">metaio_type</span><span class="o">=</span><span class="s1">&#39;MET_UCHAR&#39;</span><span class="p">,</span>
                                    <span class="n">numpy_base</span><span class="o">=</span><span class="s1">&#39;u1&#39;</span><span class="p">,</span>
+                                   <span class="n">pil_type</span><span class="o">=</span><span class="s1">&#39;RGB&#39;</span><span class="p">,</span>
                                    <span class="n">bytes_per_voxel</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
                                    <span class="n">is_rgb</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
         <span class="n">CHAR_TYPE</span><span class="p">:</span> <span class="n">DataTypeTemplate</span><span class="p">(</span><span class="n">metaio_type</span><span class="o">=</span><span class="s1">&#39;MET_CHAR&#39;</span><span class="p">,</span>
@@ -90,6 +93,7 @@
                                     <span class="n">bytes_per_voxel</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
         <span class="n">UCHAR_TYPE</span><span class="p">:</span> <span class="n">DataTypeTemplate</span><span class="p">(</span><span class="n">metaio_type</span><span class="o">=</span><span class="s1">&#39;MET_UCHAR&#39;</span><span class="p">,</span>
                                      <span class="n">numpy_base</span><span class="o">=</span><span class="s1">&#39;u1&#39;</span><span class="p">,</span>
+                                     <span class="n">pil_type</span><span class="o">=</span><span class="s1">&#39;L&#39;</span><span class="p">,</span>
                                      <span class="n">bytes_per_voxel</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
         <span class="n">SHORT_TYPE</span><span class="p">:</span> <span class="n">DataTypeTemplate</span><span class="p">(</span><span class="n">metaio_type</span><span class="o">=</span><span class="s1">&#39;MET_SHORT&#39;</span><span class="p">,</span>
                                      <span class="n">numpy_base</span><span class="o">=</span><span class="s1">&#39;i2&#39;</span><span class="p">,</span>
@@ -99,6 +103,7 @@
                                       <span class="n">bytes_per_voxel</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span>
         <span class="n">LONG_TYPE</span><span class="p">:</span> <span class="n">DataTypeTemplate</span><span class="p">(</span><span class="n">metaio_type</span><span class="o">=</span><span class="s1">&#39;MET_LONG&#39;</span><span class="p">,</span>
                                     <span class="n">numpy_base</span><span class="o">=</span><span class="s1">&#39;i4&#39;</span><span class="p">,</span>
+                                    <span class="n">pil_type</span><span class="o">=</span><span class="s1">&#39;I&#39;</span><span class="p">,</span>
                                     <span class="n">vge_type</span><span class="o">=</span><span class="s1">&#39;VolumeDataType_Float&#39;</span><span class="p">,</span>
                                     <span class="n">bytes_per_voxel</span><span class="o">=</span><span class="mi">4</span><span class="p">),</span>
         <span class="n">ULONG_TYPE</span><span class="p">:</span> <span class="n">DataTypeTemplate</span><span class="p">(</span><span class="n">metaio_type</span><span class="o">=</span><span class="s1">&#39;MET_ULONG&#39;</span><span class="p">,</span>
@@ -112,6 +117,7 @@
                                           <span class="n">bytes_per_voxel</span><span class="o">=</span><span class="mi">8</span><span class="p">),</span>
         <span class="n">FLOAT_TYPE</span><span class="p">:</span> <span class="n">DataTypeTemplate</span><span class="p">(</span><span class="n">metaio_type</span><span class="o">=</span><span class="s1">&#39;MET_FLOAT&#39;</span><span class="p">,</span>
                                      <span class="n">numpy_base</span><span class="o">=</span><span class="s1">&#39;f4&#39;</span><span class="p">,</span>
+                                     <span class="n">pil_type</span><span class="o">=</span><span class="s1">&#39;F&#39;</span><span class="p">,</span>
                                      <span class="n">bytes_per_voxel</span><span class="o">=</span><span class="mi">4</span><span class="p">),</span>
         <span class="n">DOUBLE_TYPE</span><span class="p">:</span> <span class="n">DataTypeTemplate</span><span class="p">(</span><span class="n">metaio_type</span><span class="o">=</span><span class="s1">&#39;MET_DOUBLE&#39;</span><span class="p">,</span>
                                       <span class="n">numpy_base</span><span class="o">=</span><span class="s1">&#39;f8&#39;</span><span class="p">,</span>
@@ -151,6 +157,16 @@
                            <span class="n">byte_order_msb</span><span class="o">=</span><span class="n">byte_order_msb</span><span class="p">)</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unknown type: &quot;</span> <span class="o">+</span> <span class="n">metaio_type_name</span><span class="p">)</span></div>
 
+<div class="viewcode-block" id="DataType.from_tiff"><a class="viewcode-back" href="../../../imagesplit.file.data_type.html#imagesplit.file.data_type.DataType.from_tiff">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_tiff</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">tiff_type_name</span><span class="p">,</span> <span class="n">byte_order_msb</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create a DataType from a TIFF data type string&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">data_type</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">data_type</span><span class="o">.</span><span class="n">tiff_type_name</span> <span class="o">==</span> <span class="n">tiff_type_name</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">name</span>
+                <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">template_name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+                           <span class="n">byte_order_msb</span><span class="o">=</span><span class="n">byte_order_msb</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unknown type: &quot;</span> <span class="o">+</span> <span class="n">tiff_type_name</span><span class="p">)</span></div>
+
 <div class="viewcode-block" id="DataType.from_vge"><a class="viewcode-back" href="../../../imagesplit.file.data_type.html#imagesplit.file.data_type.DataType.from_vge">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_vge</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">vge_type_name</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Create a DataType from a vge header data type string&quot;&quot;&quot;</span>
@@ -168,6 +184,15 @@
                 <span class="k">return</span> <span class="n">name</span>
 
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unknown type: &quot;</span> <span class="o">+</span> <span class="n">metaio_type_name</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DataType.name_from_tiff"><a class="viewcode-back" href="../../../imagesplit.file.data_type.html#imagesplit.file.data_type.DataType.name_from_tiff">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">name_from_tiff</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">tiff_type_name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get a DataType string from a TIFF data type string&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">data_type</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">data_type</span><span class="o">.</span><span class="n">pil_type</span> <span class="o">==</span> <span class="n">tiff_type_name</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">name</span>
+
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unsupported type: &quot;</span> <span class="o">+</span> <span class="n">tiff_type_name</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="DataType.metaio_from_name"><a class="viewcode-back" href="../../../imagesplit.file.data_type.html#imagesplit.file.data_type.DataType.metaio_from_name">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">metaio_from_name</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>

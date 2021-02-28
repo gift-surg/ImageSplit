@@ -40,7 +40,7 @@
   <h1>Source code for imagesplit.file.vol_reader</h1><div class="highlight"><pre>
 <span></span><span class="c1"># coding=utf-8</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">Utility for reading and writing data to metaio (mhd/mha) files</span>
+<span class="sd">Utility for reading and writing data to vol  files</span>
 
 <span class="sd">Author: Tom Doel</span>
 <span class="sd">Copyright UCL 2017</span>
@@ -57,8 +57,7 @@
 
 
 <div class="viewcode-block" id="VolFile"><a class="viewcode-back" href="../../../imagesplit.file.vol_reader.html#imagesplit.file.vol_reader.VolFile">[docs]</a><span class="k">class</span> <span class="nc">VolFile</span><span class="p">(</span><span class="n">LinearImageFileReader</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;A class for reading or writing 3D imaging data to/from a MetaIO file</span>
-<span class="sd">    pair (.mhd and .raw). &quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;A class for reading or writing 3D imaging data from vge/vol file pair&quot;&quot;&quot;</span>
 
     <span class="c1"># pylint: disable=too-many-instance-attributes</span>
 
@@ -190,8 +189,6 @@
 
     <span class="n">header</span> <span class="o">=</span> <span class="n">configparser</span><span class="o">.</span><span class="n">ConfigParser</span><span class="p">()</span>
     <span class="n">header</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
-
-    <span class="c1"># for section in header.sections():</span>
 
     <span class="n">header_dict</span> <span class="o">=</span> <span class="p">{</span><span class="n">s</span><span class="p">:</span> <span class="nb">dict</span><span class="p">(</span><span class="n">header</span><span class="o">.</span><span class="n">items</span><span class="p">(</span><span class="n">s</span><span class="p">))</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">header</span><span class="o">.</span><span class="n">sections</span><span class="p">()}</span>
 
