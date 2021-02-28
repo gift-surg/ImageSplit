@@ -46,6 +46,7 @@
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
 
+<span class="c1"># pylint: disable=super-with-arguments, unnecessary-pass</span>
 <div class="viewcode-block" id="ImageWrapperBase"><a class="viewcode-back" href="../../../imagesplit.image.image_wrapper.html#imagesplit.image.image_wrapper.ImageWrapperBase">[docs]</a><span class="k">class</span> <span class="nc">ImageWrapperBase</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Multi-dimensional image array with an origin&quot;&quot;&quot;</span>
 
@@ -77,7 +78,7 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Subimage is not contained within the main image&quot;</span><span class="p">)</span>
 
         <span class="c1"># Set the part of the image to this subimage</span>
-        <span class="n">selector</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">([</span><span class="nb">slice</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span><span class="p">,</span> <span class="n">e</span> <span class="ow">in</span>
+        <span class="n">selector</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">([</span><span class="nb">slice</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span><span class="p">,</span> <span class="n">e</span> <span class="ow">in</span>  <span class="c1"># pylint: disable=consider-using-generator</span>
                           <span class="nb">zip</span><span class="p">(</span><span class="n">start_indices</span><span class="p">,</span> <span class="n">end_indices</span><span class="p">)])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">selector</span><span class="p">,</span> <span class="n">local_subimage</span><span class="p">)</span></div>
 
@@ -109,7 +110,7 @@
                           <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">start_indices</span><span class="p">)))</span> \
                 <span class="ow">or</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">greater</span><span class="p">(</span><span class="n">end_indices</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">)):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Subimage is not contained within the main image&quot;</span><span class="p">)</span>
-        <span class="n">selector</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">([</span><span class="nb">slice</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span><span class="p">,</span> <span class="n">e</span> <span class="ow">in</span>
+        <span class="n">selector</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">([</span><span class="nb">slice</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span><span class="p">,</span> <span class="n">e</span> <span class="ow">in</span>  <span class="c1"># pylint: disable=consider-using-generator</span>
                           <span class="nb">zip</span><span class="p">(</span><span class="n">start_indices</span><span class="p">,</span> <span class="n">end_indices</span><span class="p">)])</span>
         <span class="k">return</span> <span class="n">ImageWrapper</span><span class="p">(</span><span class="n">origin</span><span class="o">=</span><span class="n">start</span><span class="p">,</span> <span class="n">image</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">selector</span><span class="p">))</span></div>
 

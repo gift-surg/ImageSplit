@@ -296,22 +296,22 @@
 
     <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">input</span> <span class="o">==</span> <span class="s1">&#39;_no_filename_specified&#39;</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;No filename was specified&#39;</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">assert</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span> <span class="o">&gt;=</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">7</span><span class="p">)</span>
-        <span class="n">split_file</span><span class="p">(</span><span class="n">input_file_base</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">input</span><span class="p">,</span>
-                   <span class="n">filename_out_base</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">out</span><span class="p">,</span>
-                   <span class="n">start_index</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">startindex</span><span class="p">,</span>
-                   <span class="n">output_type</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">type</span><span class="p">,</span>
-                   <span class="n">dim_order</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">axis</span><span class="p">,</span>
-                   <span class="n">file_handle_factory</span><span class="o">=</span><span class="n">FileHandleFactory</span><span class="p">(),</span>
-                   <span class="n">output_format</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">format</span><span class="p">,</span>
-                   <span class="n">slice_output</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">slice</span><span class="p">,</span>
-                   <span class="n">rescale</span><span class="o">=</span><span class="n">rescale</span><span class="p">,</span>
-                   <span class="n">out_compression</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">compress</span><span class="p">,</span>
-                   <span class="n">max_block_size_voxels</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">max</span><span class="p">,</span>
-                   <span class="n">overlap_size_voxels</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">overlap</span><span class="p">,</span>
-                   <span class="n">descriptor_filename</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">descriptor</span><span class="p">,</span>
-                   <span class="n">test</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">test</span><span class="p">)</span></div>
+
+    <span class="k">assert</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span> <span class="o">&gt;=</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">7</span><span class="p">)</span>
+    <span class="n">split_file</span><span class="p">(</span><span class="n">input_file_base</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">input</span><span class="p">,</span>
+               <span class="n">filename_out_base</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">out</span><span class="p">,</span>
+               <span class="n">start_index</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">startindex</span><span class="p">,</span>
+               <span class="n">output_type</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">type</span><span class="p">,</span>
+               <span class="n">dim_order</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">axis</span><span class="p">,</span>
+               <span class="n">file_handle_factory</span><span class="o">=</span><span class="n">FileHandleFactory</span><span class="p">(),</span>
+               <span class="n">output_format</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">format</span><span class="p">,</span>
+               <span class="n">slice_output</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">slice</span><span class="p">,</span>
+               <span class="n">rescale</span><span class="o">=</span><span class="n">rescale</span><span class="p">,</span>
+               <span class="n">out_compression</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">compress</span><span class="p">,</span>
+               <span class="n">max_block_size_voxels</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">max</span><span class="p">,</span>
+               <span class="n">overlap_size_voxels</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">overlap</span><span class="p">,</span>
+               <span class="n">descriptor_filename</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">descriptor</span><span class="p">,</span>
+               <span class="n">test</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">test</span><span class="p">)</span></div>
 
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>

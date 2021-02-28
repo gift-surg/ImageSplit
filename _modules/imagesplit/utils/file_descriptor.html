@@ -364,7 +364,7 @@
             <span class="n">voxel_size</span><span class="o">=</span><span class="n">voxel_size</span>
         <span class="p">))</span>
 
-        <span class="k">if</span> <span class="n">start_index</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">start_index</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pylint: disable=no-else-break</span>
             <span class="c1"># Single file already loaded, so terminate the while True loop</span>
             <span class="k">break</span>
         <span class="k">else</span><span class="p">:</span>
