@@ -13,7 +13,7 @@ class TiffFileReader(BlockImageFileReader):
     """Read and write to TIFF files"""
 
     def __init__(self, filename, image_size, data_type):
-        super(TiffFileReader, self).__init__(image_size, data_type)
+        super(TiffFileReader, self).__init__(image_size, data_type)    # pylint: disable=super-with-arguments
         self.cached_image = None
         self.filename = filename
 

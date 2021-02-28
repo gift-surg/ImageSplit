@@ -256,22 +256,22 @@ def main(args=None):
 
     if args.input == '_no_filename_specified':
         raise ValueError('No filename was specified')
-    else:
-        assert sys.version_info >= (2, 7)
-        split_file(input_file_base=args.input,
-                   filename_out_base=args.out,
-                   start_index=args.startindex,
-                   output_type=args.type,
-                   dim_order=args.axis,
-                   file_handle_factory=FileHandleFactory(),
-                   output_format=args.format,
-                   slice_output=args.slice,
-                   rescale=rescale,
-                   out_compression=args.compress,
-                   max_block_size_voxels=args.max,
-                   overlap_size_voxels=args.overlap,
-                   descriptor_filename=args.descriptor,
-                   test=args.test)
+
+    assert sys.version_info >= (2, 7)
+    split_file(input_file_base=args.input,
+               filename_out_base=args.out,
+               start_index=args.startindex,
+               output_type=args.type,
+               dim_order=args.axis,
+               file_handle_factory=FileHandleFactory(),
+               output_format=args.format,
+               slice_output=args.slice,
+               rescale=rescale,
+               out_compression=args.compress,
+               max_block_size_voxels=args.max,
+               overlap_size_voxels=args.overlap,
+               descriptor_filename=args.descriptor,
+               test=args.test)
 
 
 if __name__ == '__main__':

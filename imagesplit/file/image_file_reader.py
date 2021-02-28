@@ -11,6 +11,7 @@ from imagesplit.image.image_wrapper import ImageWrapper, ImageStorage
 from imagesplit.utils.utilities import rescale_image
 
 
+# pylint:disable=unnecessary-pass
 class ImageFileReader(object):
     """Base class for writing data from source to destination"""
     __metaclass__ = ABCMeta

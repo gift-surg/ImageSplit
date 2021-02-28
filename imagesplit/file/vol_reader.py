@@ -24,7 +24,7 @@ class VolFile(LinearImageFileReader):
 
     def __init__(self, local_image_size, header_filename,
                  file_handle_factory):
-        super(VolFile, self).__init__(local_image_size)
+        super(VolFile, self).__init__(local_image_size)  # pylint: disable=super-with-arguments
         self._file_handle_factory = file_handle_factory
         self._header_filename = header_filename
         self._input_path = os.path.dirname(os.path.abspath(header_filename))

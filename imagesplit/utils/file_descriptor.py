@@ -324,7 +324,7 @@ def generate_input_descriptors(input_file, start_index):
             voxel_size=voxel_size
         ))
 
-        if start_index is None:
+        if start_index is None:  # pylint: disable=no-else-break
             # Single file already loaded, so terminate the while True loop
             break
         else:

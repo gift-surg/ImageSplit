@@ -6,6 +6,7 @@ from PIL import Image
 import numpy as np
 
 
+# pylint: disable=super-with-arguments, unnecessary-pass
 class ImageWrapperBase(object):
     """Multi-dimensional image array with an origin"""
 
@@ -37,7 +38,7 @@ class ImageWrapperBase(object):
             raise ValueError("Subimage is not contained within the main image")
 
         # Set the part of the image to this subimage
-        selector = tuple([slice(s, e) for s, e in
+        selector = tuple([slice(s, e) for s, e in  # pylint: disable=consider-using-generator
                           zip(start_indices, end_indices)])
         self.image.set(selector, local_subimage)
 
@@ -69,7 +70,7 @@ class ImageWrapper(ImageWrapperBase):
                           np.zeros_like(start_indices))) \
                 or np.any(np.greater(end_indices, self.size)):
             raise ValueError("Subimage is not contained within the main image")
-        selector = tuple([slice(s, e) for s, e in
+        selector = tuple([slice(s, e) for s, e in  # pylint: disable=consider-using-generator
                           zip(start_indices, end_indices)])
         return ImageWrapper(origin=start, image=self.image.get(selector))
 

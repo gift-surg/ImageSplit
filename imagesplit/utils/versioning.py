@@ -26,7 +26,6 @@ def _get_module_path():
 
     return os.path.dirname(os.path.realpath(__file__))
 
- 
 def get_version_string():
     """
     Return a user-visible string describing the name and product version
@@ -45,7 +44,7 @@ def version_from_pip():
     """Return a version string based on the git repo, conforming to PEP440"""
 
     try:
-        import pkg_resources
+        import pkg_resources  # pylint: disable=import-outside-toplevel
         version_string = pkg_resources.get_distribution("imagesplit").version
         if _check_pip_version(version_string):
             return version_string
@@ -59,7 +58,7 @@ def version_from_versioneer():
 
     # Attempt to get the version string from the git repository
     try:
-        from .versioneer_version import get_versions
+        from .versioneer_version import get_versions  # pylint: disable=import-outside-toplevel
         version_info = get_versions()
         if version_info['error'] is None:
             return version_info['version']

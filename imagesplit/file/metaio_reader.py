@@ -25,7 +25,7 @@ class MetaIoFile(LinearImageFileReader):
     """A class for reading or writing 3D imaging data to/from a MetaIO file
     pair (.mhd and .raw). """
 
-    # pylint: disable=too-many-instance-attributes
+    # pylint: disable=too-many-instance-attributes, super-with-arguments
 
     def __init__(self, local_file_size, header_filename,
                  file_handle_factory, header_template):
