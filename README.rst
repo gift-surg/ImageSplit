@@ -1,12 +1,6 @@
 ImageSplit
 ==========
 
-.. image:: https://cmiclab.cs.ucl.ac.uk/GIFT-Surg/ImageSplit/raw/master/giftsurg-icon.png
-    :height: 128px
-    :width: 128px
-    :target: https://cmiclab.cs.ucl.ac.uk/GIFT-Surg/ImageSplit
-
-
 .. image:: https://cmiclab.cs.ucl.ac.uk/GIFT-Surg/ImageSplit/badges/master/build.svg
     :target: https://cmiclab.cs.ucl.ac.uk/GIFT-Surg/ImageSplit/commits/master
     :alt: GitLab-CI test status
@@ -25,11 +19,14 @@ ImageSplit
 
 ImageSplit is a utility for splitting very large image volumes into slices or multiple overlapping sub-volumes, and for recombining sub-volumes into a one or more volumes. ImageSplit can also convert the underlying data types.
 
+ImageSplit was originally developed to process medical image volumes. As such it mostly supports MetaIO (.mhd/.mha) files at present. There is some limited ability to read .vge image volumes and to read/write monochrome TIFF files.
+
+Note that many TIFF viewers do not support the full range of datatypes that can be written out by ImageSplit. If can you cannot view output TIFFs, try using a different TIFF Viewer such as ImageJ.
+
 ImageSplit is designed to prioritise low memory usage over performance, so that large volumes can be easily processed with limited memory resources.
 
 Author: Tom Doel
 
-ImageSplit was developed as part of the `GIFT-Surg`_ project, at the `Translational Imaging Group (TIG)`_ in the `Centre for Medical Image Computing (CMIC)`_ at `University College London (UCL)`_.
 
 
 Installing
@@ -185,21 +182,21 @@ Useful links
 Licensing and copyright
 -----------------------
 
-Copyright 2017-2018 University College London.
 ImageSplit is released under the BSD-3 licence. Please see the `license file`_ for details.
 
-
 Acknowledgements
-----------------
+~~~~~~~~~~~~~~~~
 
-Supported by `Wellcome`_ and `EPSRC`_.
+ImageSplit was originally developed as part of the `GIFT-Surg`_ project in the `Centre for Medical Image Computing (CMIC)`_ at `University College London (UCL)`_.
+Code published prior to September 2018 is Copyright 2017-2018 University College London.
+
+The GIFT-Surg project is supported by `Wellcome`_ and `EPSRC`_.
 
 
 .. _`Wellcome EPSRC Centre for Interventional and Surgical Sciences`: http://www.ucl.ac.uk/weiss
 .. _`source code repository`: https://cmiclab.cs.ucl.ac.uk/GIFT-Surg/ImageSplit
 .. _`Documentation`: https://imagesplit.readthedocs.io
 .. _`University College London (UCL)`: http://www.ucl.ac.uk/
-.. _`Translational Imaging Group (TIG)`: http://cmictig.cs.ucl.ac.uk/
 .. _`Centre for Medical Image Computing (CMIC)`: http://cmic.cs.ucl.ac.uk
 .. _`Wellcome`: https://wellcome.ac.uk/
 .. _`GIFT-Surg`: https://www.gift-surg.ac.uk
