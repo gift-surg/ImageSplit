@@ -1,21 +1,31 @@
 ImageSplit
 ==========
 
-.. image:: https://cmiclab.cs.ucl.ac.uk/GIFT-Surg/ImageSplit/badges/master/build.svg
-    :target: https://cmiclab.cs.ucl.ac.uk/GIFT-Surg/ImageSplit/commits/master
-    :alt: GitLab-CI test status
 
-.. image:: https://travis-ci.org/tomdoel/ImageSplit.svg?branch=master
-    :target: https://travis-ci.org/tomdoel/ImageSplit
-    :alt: Travis test status
+.. image:: https://github.com/tomdoel/ImageSplit/workflows/test/badge.svg
+    :target: https://github.com/tomdoel/ImageSplit/actions/workflows/test.yml
+    :alt: Test
 
-.. image:: https://cmiclab.cs.ucl.ac.uk/GIFT-Surg/ImageSplit/badges/master/coverage.svg
-    :target: https://cmiclab.cs.ucl.ac.uk/GIFT-Surg/ImageSplit/commits/master
-    :alt: Test coverage
+.. image:: https://github.com/tomdoel/ImageSplit/workflows/docs/badge.svg
+    :target: https://tomdoel.github.io/ImageSplit/
+    :alt: Docs
+
+.. image:: https://github.com/tomdoel/ImageSplit/workflows/package/badge.svg
+    :target: https://pypi.org/project/imagesplit
+    :alt: Package
+
+.. image:: https://github.com/tomdoel/ImageSplit/workflows/package/badge.svg
+    :target: https://github.com/tomdoel/ImageSplit/blob/main/LICENSE
+    :alt: Package
+
+.. image:: https://img.shields.io/pypi/v/imagesplit
+    :target: https://pypi.org/project/imagesplit/
+    :alt: Package
 
 .. image:: https://readthedocs.org/projects/imagesplit/badge/?version=latest
     :target: http://imagesplit.readthedocs.io/en/latest/?badge=latest
-    :alt: Documentation Status
+    :alt: ReadTheDocs
+
 
 ImageSplit is a utility for splitting very large image volumes into slices or multiple overlapping sub-volumes, and for recombining sub-volumes into a one or more volumes. ImageSplit can also convert the underlying data types.
 
