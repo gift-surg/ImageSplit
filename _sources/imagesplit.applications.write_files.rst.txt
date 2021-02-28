@@ -1,0 +1,7 @@
+imagesplit.applications.write\_files module
+===========================================
+
+.. automodule:: imagesplit.applications.write_files
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -1,0 +1,165 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>imagesplit.file.format_factory &#8212; ImageSplit  documentation</title>
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/classic.css" type="text/css" />
+    
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">ImageSplit  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">imagesplit.file.format_factory</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for imagesplit.file.format_factory</h1><div class="highlight"><pre>
+<span></span><span class="c1"># coding=utf-8</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Support multiple imaging formats</span>
+
+<span class="sd">Author: Tom Doel</span>
+<span class="sd">Copyright UCL 2017</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">imagesplit.file.file_formats</span> <span class="kn">import</span> <span class="n">FileFormats</span>
+<span class="kn">from</span> <span class="nn">imagesplit.file.metaio_reader</span> <span class="kn">import</span> <span class="n">MetaIoFile</span>
+<span class="kn">from</span> <span class="nn">imagesplit.file.tiff_file_reader</span> <span class="kn">import</span> <span class="n">TiffFileReader</span>
+<span class="kn">from</span> <span class="nn">imagesplit.file.vol_reader</span> <span class="kn">import</span> <span class="n">VolFile</span>
+
+
+<div class="viewcode-block" id="FormatFactory"><a class="viewcode-back" href="../../../imagesplit.file.format_factory.html#imagesplit.file.format_factory.FormatFactory">[docs]</a><span class="k">class</span> <span class="nc">FormatFactory</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return required factory for image file formats&quot;&quot;&quot;</span>
+
+    <span class="n">_factories</span> <span class="o">=</span> <span class="p">{</span><span class="n">FileFormats</span><span class="o">.</span><span class="n">METAIO_FORMAT</span><span class="p">:</span> <span class="n">MetaIoFile</span><span class="p">,</span>
+                  <span class="n">FileFormats</span><span class="o">.</span><span class="n">VOL_FORMAT</span><span class="p">:</span> <span class="n">VolFile</span><span class="p">,</span>
+                  <span class="n">FileFormats</span><span class="o">.</span><span class="n">TIFF_FORMAT</span><span class="p">:</span> <span class="n">TiffFileReader</span><span class="p">}</span>
+
+<div class="viewcode-block" id="FormatFactory.get_factory"><a class="viewcode-back" href="../../../imagesplit.file.format_factory.html#imagesplit.file.format_factory.FormatFactory.get_factory">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_factory</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">format_string</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get the file factory for this format&quot;&quot;&quot;</span>
+
+        <span class="n">format_string</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">simplify_format</span><span class="p">(</span><span class="n">format_string</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">format_string</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_factories</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_factories</span><span class="p">[</span><span class="n">format_string</span><span class="p">]</span>
+
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unknown file format: &quot;</span> <span class="o">+</span> <span class="n">format_string</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="FormatFactory.extension_to_format"><a class="viewcode-back" href="../../../imagesplit.file.format_factory.html#imagesplit.file.format_factory.FormatFactory.extension_to_format">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">extension_to_format</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">file_extension</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get the format name for this file&quot;&quot;&quot;</span>
+
+        <span class="c1"># Remove leading and trailing spaces and leading period if it exists</span>
+        <span class="n">ext</span> <span class="o">=</span> <span class="n">file_extension</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">ext</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;mhd&quot;</span><span class="p">,</span> <span class="s2">&quot;mha&quot;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">FileFormats</span><span class="o">.</span><span class="n">METAIO_FORMAT</span>
+
+        <span class="k">elif</span> <span class="n">ext</span> <span class="o">==</span> <span class="s2">&quot;vge&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">FileFormats</span><span class="o">.</span><span class="n">VOL_FORMAT</span>
+
+        <span class="k">elif</span> <span class="n">ext</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;tif&quot;</span><span class="p">,</span> <span class="s2">&quot;tiff&quot;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">FileFormats</span><span class="o">.</span><span class="n">TIFF_FORMAT</span>
+
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unknown file format: &quot;</span> <span class="o">+</span> <span class="n">file_extension</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="FormatFactory.simplify_format"><a class="viewcode-back" href="../../../imagesplit.file.format_factory.html#imagesplit.file.format_factory.FormatFactory.simplify_format">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">simplify_format</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">format_name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get the standard format name for a format name which should be</span>
+<span class="sd">        standard but may have been modified&quot;&quot;&quot;</span>
+
+        <span class="c1"># Remove leading and trailing spaces and leading period if it exists</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="n">format_name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;mhd&quot;</span><span class="p">,</span> <span class="s2">&quot;mha&quot;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">FileFormats</span><span class="o">.</span><span class="n">METAIO_FORMAT</span>
+
+        <span class="k">elif</span> <span class="n">name</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;vge&quot;</span><span class="p">,</span> <span class="s2">&quot;vol&quot;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">FileFormats</span><span class="o">.</span><span class="n">VOL_FORMAT</span>
+
+        <span class="k">elif</span> <span class="n">name</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;tif&quot;</span><span class="p">,</span> <span class="s2">&quot;tiff&quot;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">FileFormats</span><span class="o">.</span><span class="n">TIFF_FORMAT</span>
+
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unknown file format: &quot;</span> <span class="o">+</span> <span class="n">format_name</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="FormatFactory.get_extension_for_format"><a class="viewcode-back" href="../../../imagesplit.file.format_factory.html#imagesplit.file.format_factory.FormatFactory.get_extension_for_format">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_extension_for_format</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">file_format</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the output file extension for this file format&quot;&quot;&quot;</span>
+
+        <span class="n">file_format</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">simplify_format</span><span class="p">(</span><span class="n">file_format</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">file_format</span> <span class="o">==</span> <span class="s2">&quot;mhd&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;.mhd&quot;</span>
+        <span class="k">elif</span> <span class="n">file_format</span> <span class="o">==</span> <span class="s2">&quot;tiff&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;.tiff&quot;</span>
+
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Format &quot;</span> <span class="o">+</span> <span class="n">file_format</span> <span class="o">+</span> <span class="s2">&quot; not supported&quot;</span><span class="p">)</span></div></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../../index.html">
+              <img class="logo" src="../../../_static/giftsurg-icon.png" alt="Logo"/>
+            </a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">ImageSplit  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">imagesplit.file.format_factory</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, UCL.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.5.1.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,19 @@
+imagesplit.image package
+========================
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 4
+
+   imagesplit.image.combined_image
+   imagesplit.image.image_wrapper
+
+Module contents
+---------------
+
+.. automodule:: imagesplit.image
+   :members:
+   :undoc-members:
+   :show-inheritance:

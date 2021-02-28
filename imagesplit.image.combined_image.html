@@ -1,0 +1,275 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>imagesplit.image.combined_image module &#8212; ImageSplit  documentation</title>
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">ImageSplit  documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">imagesplit.image.combined_image module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-imagesplit.image.combined_image">
+<span id="imagesplit-image-combined-image-module"></span><h1>imagesplit.image.combined_image module<a class="headerlink" href="#module-imagesplit.image.combined_image" title="Permalink to this headline">¶</a></h1>
+<p>Classes for aggregating images from multiple files into a single image</p>
+<dl class="py class">
+<dt id="imagesplit.image.combined_image.Axis">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">imagesplit.image.combined_image.</span></code><code class="sig-name descname"><span class="pre">Axis</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dim_order</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dim_flip</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/image/combined_image.html#Axis"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.image.combined_image.Axis" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Defines coordinate system used by image coordinates</p>
+<dl class="py method">
+<dt id="imagesplit.image.combined_image.Axis.from_condensed_format">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">from_condensed_format</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dim_order_and_flip</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/image/combined_image.html#Axis.from_condensed_format"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.image.combined_image.Axis.from_condensed_format" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates an Axis from a condensed axis array</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="imagesplit.image.combined_image.Axis.to_condensed_format">
+<code class="sig-name descname"><span class="pre">to_condensed_format</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/image/combined_image.html#Axis.to_condensed_format"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.image.combined_image.Axis.to_condensed_format" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a condensed Axis array for this Axis</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="imagesplit.image.combined_image.CombinedImage">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">imagesplit.image.combined_image.</span></code><code class="sig-name descname"><span class="pre">CombinedImage</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">descriptors</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_factory</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/image/combined_image.html#CombinedImage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.image.combined_image.CombinedImage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A kind of virtual file for writing where the data are distributed
+across multiple real files.</p>
+<dl class="py method">
+<dt id="imagesplit.image.combined_image.CombinedImage.close">
+<code class="sig-name descname"><span class="pre">close</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/image/combined_image.html#CombinedImage.close"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.image.combined_image.CombinedImage.close" title="Permalink to this definition">¶</a></dt>
+<dd><p>Closes all streams and files</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="imagesplit.image.combined_image.CombinedImage.get_limits">
+<code class="sig-name descname"><span class="pre">get_limits</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/image/combined_image.html#CombinedImage.get_limits"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.image.combined_image.CombinedImage.get_limits" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return minimum and maximum values across all subimages</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="imagesplit.image.combined_image.CombinedImage.read_image">
+<code class="sig-name descname"><span class="pre">read_image</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start_local</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size_local</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transformer</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/image/combined_image.html#CombinedImage.read_image"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.image.combined_image.CombinedImage.read_image" title="Permalink to this definition">¶</a></dt>
+<dd><p>Assembles an image range from subimages</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="imagesplit.image.combined_image.CombinedImage.write_image">
+<code class="sig-name descname"><span class="pre">write_image</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rescale</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/image/combined_image.html#CombinedImage.write_image"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.image.combined_image.CombinedImage.write_image" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write out all the subimages with data from supplied source</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="imagesplit.image.combined_image.CoordinateTransformer">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">imagesplit.image.combined_image.</span></code><code class="sig-name descname"><span class="pre">CoordinateTransformer</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">origin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/image/combined_image.html#CoordinateTransformer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.image.combined_image.CoordinateTransformer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Convert coordinates between orthogonal systems</p>
+<dl class="py method">
+<dt id="imagesplit.image.combined_image.CoordinateTransformer.image_to_global">
+<code class="sig-name descname"><span class="pre">image_to_global</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">local_image</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/image/combined_image.html#CoordinateTransformer.image_to_global"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.image.combined_image.CoordinateTransformer.image_to_global" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert local coordinates to global coordinates</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="imagesplit.image.combined_image.CoordinateTransformer.image_to_local">
+<code class="sig-name descname"><span class="pre">image_to_local</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">global_image</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/image/combined_image.html#CoordinateTransformer.image_to_local"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.image.combined_image.CoordinateTransformer.image_to_local" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transform global image to local coordinate system</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="imagesplit.image.combined_image.CoordinateTransformer.image_to_other">
+<code class="sig-name descname"><span class="pre">image_to_other</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">local_image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">other_transformer</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/image/combined_image.html#CoordinateTransformer.image_to_other"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.image.combined_image.CoordinateTransformer.image_to_other" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transform image to a different local coordinate system</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="imagesplit.image.combined_image.CoordinateTransformer.to_global">
+<code class="sig-name descname"><span class="pre">to_global</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">local_start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">local_size</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/image/combined_image.html#CoordinateTransformer.to_global"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.image.combined_image.CoordinateTransformer.to_global" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert local coordinates to global coordinates</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="imagesplit.image.combined_image.CoordinateTransformer.to_local">
+<code class="sig-name descname"><span class="pre">to_local</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">global_start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">global_size</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/image/combined_image.html#CoordinateTransformer.to_local"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.image.combined_image.CoordinateTransformer.to_local" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert global coordinates to local coordinates</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="imagesplit.image.combined_image.CoordinateTransformer.to_other">
+<code class="sig-name descname"><span class="pre">to_other</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">local_start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">local_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">other_transformer</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/image/combined_image.html#CoordinateTransformer.to_other"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.image.combined_image.CoordinateTransformer.to_other" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert local coordinates to a different local system</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="imagesplit.image.combined_image.Limits">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">imagesplit.image.combined_image.</span></code><code class="sig-name descname"><span class="pre">Limits</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rmin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rmax</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/image/combined_image.html#Limits"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.image.combined_image.Limits" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Image range values across all subimages</p>
+</dd></dl>
+
+<dl class="py class">
+<dt id="imagesplit.image.combined_image.LocalSource">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">imagesplit.image.combined_image.</span></code><code class="sig-name descname"><span class="pre">LocalSource</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transformer</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/image/combined_image.html#LocalSource"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.image.combined_image.LocalSource" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#imagesplit.image.combined_image.Source" title="imagesplit.image.combined_image.Source"><code class="xref py py-class docutils literal notranslate"><span class="pre">imagesplit.image.combined_image.Source</span></code></a></p>
+<p>Fetch and transform data using local coordinates</p>
+<dl class="py method">
+<dt id="imagesplit.image.combined_image.LocalSource.close">
+<code class="sig-name descname"><span class="pre">close</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/image/combined_image.html#LocalSource.close"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.image.combined_image.LocalSource.close" title="Permalink to this definition">¶</a></dt>
+<dd><p>Close all streams and files</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="imagesplit.image.combined_image.LocalSource.read_image">
+<code class="sig-name descname"><span class="pre">read_image</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/image/combined_image.html#LocalSource.read_image"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.image.combined_image.LocalSource.read_image" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a partial image using the specified local coordinates</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="imagesplit.image.combined_image.Source">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">imagesplit.image.combined_image.</span></code><code class="sig-name descname"><span class="pre">Source</span></code><a class="reference internal" href="_modules/imagesplit/image/combined_image.html#Source"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.image.combined_image.Source" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Base class for reading data</p>
+<dl class="py method">
+<dt id="imagesplit.image.combined_image.Source.close">
+<em class="property"><span class="pre">abstract</span> </em><code class="sig-name descname"><span class="pre">close</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/image/combined_image.html#Source.close"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.image.combined_image.Source.close" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read image from specified starting coordinates and size</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="imagesplit.image.combined_image.Source.read_image">
+<em class="property"><span class="pre">abstract</span> </em><code class="sig-name descname"><span class="pre">read_image</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/image/combined_image.html#Source.read_image"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.image.combined_image.Source.read_image" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read image from specified starting coordinates and size</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="imagesplit.image.combined_image.SubImage">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">imagesplit.image.combined_image.</span></code><code class="sig-name descname"><span class="pre">SubImage</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">descriptor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_factory</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/image/combined_image.html#SubImage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.image.combined_image.SubImage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#imagesplit.image.combined_image.Source" title="imagesplit.image.combined_image.Source"><code class="xref py py-class docutils literal notranslate"><span class="pre">imagesplit.image.combined_image.Source</span></code></a></p>
+<p>An image which forms part of a larger image</p>
+<dl class="py method">
+<dt id="imagesplit.image.combined_image.SubImage.bind_by_roi">
+<code class="sig-name descname"><span class="pre">bind_by_roi</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start_global</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size_global</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/image/combined_image.html#SubImage.bind_by_roi"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.image.combined_image.SubImage.bind_by_roi" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find the part of the specified region that fits within the ROI</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="imagesplit.image.combined_image.SubImage.close">
+<code class="sig-name descname"><span class="pre">close</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/image/combined_image.html#SubImage.close"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.image.combined_image.SubImage.close" title="Permalink to this definition">¶</a></dt>
+<dd><p>Close all streams and files</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="imagesplit.image.combined_image.SubImage.get_limits">
+<code class="sig-name descname"><span class="pre">get_limits</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/image/combined_image.html#SubImage.get_limits"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.image.combined_image.SubImage.get_limits" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return minimum and maximum values across all subimages</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="imagesplit.image.combined_image.SubImage.read_image">
+<code class="sig-name descname"><span class="pre">read_image</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/image/combined_image.html#SubImage.read_image"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.image.combined_image.SubImage.read_image" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a subimage containing any overlap from the image</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="imagesplit.image.combined_image.SubImage.read_image_bound_by_roi">
+<code class="sig-name descname"><span class="pre">read_image_bound_by_roi</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/image/combined_image.html#SubImage.read_image_bound_by_roi"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.image.combined_image.SubImage.read_image_bound_by_roi" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a subimage containing any overlap from the ROI</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="imagesplit.image.combined_image.SubImage.write_image">
+<code class="sig-name descname"><span class="pre">write_image</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">global_source</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rescale_limits</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/image/combined_image.html#SubImage.write_image"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.image.combined_image.SubImage.write_image" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write out SubImage using data from the specified source</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/giftsurg-icon.png" alt="Logo"/>
+            </a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/imagesplit.image.combined_image.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">ImageSplit  documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">imagesplit.image.combined_image module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, UCL.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.5.1.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,7 @@
+imagesplit.utils.file\_descriptor module
+========================================
+
+.. automodule:: imagesplit.utils.file_descriptor
+   :members:
+   :undoc-members:
+   :show-inheritance:

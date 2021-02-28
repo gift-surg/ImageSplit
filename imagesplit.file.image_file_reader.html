@@ -1,0 +1,180 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>imagesplit.file.image_file_reader module &#8212; ImageSplit  documentation</title>
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">ImageSplit  documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">imagesplit.file.image_file_reader module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-imagesplit.file.image_file_reader">
+<span id="imagesplit-file-image-file-reader-module"></span><h1>imagesplit.file.image_file_reader module<a class="headerlink" href="#module-imagesplit.file.image_file_reader" title="Permalink to this headline">¶</a></h1>
+<p>Write multidimensional data line by line</p>
+<dl class="py class">
+<dt id="imagesplit.file.image_file_reader.BlockImageFileReader">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">imagesplit.file.image_file_reader.</span></code><code class="sig-name descname"><span class="pre">BlockImageFileReader</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_type</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/file/image_file_reader.html#BlockImageFileReader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.file.image_file_reader.BlockImageFileReader" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#imagesplit.file.image_file_reader.ImageFileReader" title="imagesplit.file.image_file_reader.ImageFileReader"><code class="xref py py-class docutils literal notranslate"><span class="pre">imagesplit.file.image_file_reader.ImageFileReader</span></code></a></p>
+<p>Base class for writing data from source to destination as a  2d block</p>
+<dl class="py method">
+<dt id="imagesplit.file.image_file_reader.BlockImageFileReader.close_file">
+<em class="property"><span class="pre">abstract</span> </em><code class="sig-name descname"><span class="pre">close_file</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/file/image_file_reader.html#BlockImageFileReader.close_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.file.image_file_reader.BlockImageFileReader.close_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Close the file</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="imagesplit.file.image_file_reader.BlockImageFileReader.load">
+<em class="property"><span class="pre">abstract</span> </em><code class="sig-name descname"><span class="pre">load</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/file/image_file_reader.html#BlockImageFileReader.load"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.file.image_file_reader.BlockImageFileReader.load" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads an image from the file</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="imagesplit.file.image_file_reader.BlockImageFileReader.read_image">
+<code class="sig-name descname"><span class="pre">read_image</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start_local</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size_local</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/file/image_file_reader.html#BlockImageFileReader.read_image"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.file.image_file_reader.BlockImageFileReader.read_image" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read the specified part of the image</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="imagesplit.file.image_file_reader.BlockImageFileReader.save">
+<em class="property"><span class="pre">abstract</span> </em><code class="sig-name descname"><span class="pre">save</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/file/image_file_reader.html#BlockImageFileReader.save"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.file.image_file_reader.BlockImageFileReader.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write the image to the file</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="imagesplit.file.image_file_reader.BlockImageFileReader.write_image">
+<code class="sig-name descname"><span class="pre">write_image</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_source</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rescale_limits</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/file/image_file_reader.html#BlockImageFileReader.write_image"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.file.image_file_reader.BlockImageFileReader.write_image" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create and write out this file, using data from this image source</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="imagesplit.file.image_file_reader.ImageFileReader">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">imagesplit.file.image_file_reader.</span></code><code class="sig-name descname"><span class="pre">ImageFileReader</span></code><a class="reference internal" href="_modules/imagesplit/file/image_file_reader.html#ImageFileReader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.file.image_file_reader.ImageFileReader" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Base class for writing data from source to destination</p>
+<dl class="py method">
+<dt id="imagesplit.file.image_file_reader.ImageFileReader.write_image">
+<em class="property"><span class="pre">abstract</span> </em><code class="sig-name descname"><span class="pre">write_image</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_source</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rescale_limits</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/file/image_file_reader.html#ImageFileReader.write_image"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.file.image_file_reader.ImageFileReader.write_image" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create and write out this file, using data from this image source</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="imagesplit.file.image_file_reader.LinearImageFileReader">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">imagesplit.file.image_file_reader.</span></code><code class="sig-name descname"><span class="pre">LinearImageFileReader</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_size</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/file/image_file_reader.html#LinearImageFileReader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.file.image_file_reader.LinearImageFileReader" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#imagesplit.file.image_file_reader.ImageFileReader" title="imagesplit.file.image_file_reader.ImageFileReader"><code class="xref py py-class docutils literal notranslate"><span class="pre">imagesplit.file.image_file_reader.ImageFileReader</span></code></a></p>
+<p>Base class for writing data from source to destination line by line</p>
+<dl class="py method">
+<dt id="imagesplit.file.image_file_reader.LinearImageFileReader.close_file">
+<em class="property"><span class="pre">abstract</span> </em><code class="sig-name descname"><span class="pre">close_file</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/file/image_file_reader.html#LinearImageFileReader.close_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.file.image_file_reader.LinearImageFileReader.close_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Close the file</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="imagesplit.file.image_file_reader.LinearImageFileReader.read_image">
+<code class="sig-name descname"><span class="pre">read_image</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start_local</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size_local</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/file/image_file_reader.html#LinearImageFileReader.read_image"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.file.image_file_reader.LinearImageFileReader.read_image" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read the specified part of the image</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="imagesplit.file.image_file_reader.LinearImageFileReader.read_line">
+<em class="property"><span class="pre">abstract</span> </em><code class="sig-name descname"><span class="pre">read_line</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_voxels</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/file/image_file_reader.html#LinearImageFileReader.read_line"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.file.image_file_reader.LinearImageFileReader.read_line" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads a line of bytes from the file</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="imagesplit.file.image_file_reader.LinearImageFileReader.write_image">
+<code class="sig-name descname"><span class="pre">write_image</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_source</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rescale_limits</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/file/image_file_reader.html#LinearImageFileReader.write_image"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.file.image_file_reader.LinearImageFileReader.write_image" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create and write out this file, using data from this image source</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="imagesplit.file.image_file_reader.LinearImageFileReader.write_line">
+<em class="property"><span class="pre">abstract</span> </em><code class="sig-name descname"><span class="pre">write_line</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_line</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rescale_limits</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/file/image_file_reader.html#LinearImageFileReader.write_line"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.file.image_file_reader.LinearImageFileReader.write_line" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write the next line of bytes to the file</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/giftsurg-icon.png" alt="Logo"/>
+            </a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/imagesplit.file.image_file_reader.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">ImageSplit  documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">imagesplit.file.image_file_reader module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, UCL.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.5.1.
+    </div>
+  </body>
+</html>

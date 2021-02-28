@@ -1,0 +1,217 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>imagesplit.file.data_type module &#8212; ImageSplit  documentation</title>
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">ImageSplit  documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">imagesplit.file.data_type module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-imagesplit.file.data_type">
+<span id="imagesplit-file-data-type-module"></span><h1>imagesplit.file.data_type module<a class="headerlink" href="#module-imagesplit.file.data_type" title="Permalink to this headline">¶</a></h1>
+<p>Support multiple imaging data types</p>
+<p>Author: Tom Doel
+Copyright UCL 2017</p>
+<dl class="py class">
+<dt id="imagesplit.file.data_type.DataType">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">imagesplit.file.data_type.</span></code><code class="sig-name descname"><span class="pre">DataType</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">template_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">byte_order_msb</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compression</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_imagej</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/file/data_type.html#DataType"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.file.data_type.DataType" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Return required factory for image file formats</p>
+<dl class="py attribute">
+<dt id="imagesplit.file.data_type.DataType.CHAR_TYPE">
+<code class="sig-name descname"><span class="pre">CHAR_TYPE</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'char'</span></em><a class="headerlink" href="#imagesplit.file.data_type.DataType.CHAR_TYPE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="imagesplit.file.data_type.DataType.DOUBLE_TYPE">
+<code class="sig-name descname"><span class="pre">DOUBLE_TYPE</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'double'</span></em><a class="headerlink" href="#imagesplit.file.data_type.DataType.DOUBLE_TYPE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="imagesplit.file.data_type.DataType.FLOAT_TYPE">
+<code class="sig-name descname"><span class="pre">FLOAT_TYPE</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'float'</span></em><a class="headerlink" href="#imagesplit.file.data_type.DataType.FLOAT_TYPE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="imagesplit.file.data_type.DataType.LONG_LONG_TYPE">
+<code class="sig-name descname"><span class="pre">LONG_LONG_TYPE</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'longlong'</span></em><a class="headerlink" href="#imagesplit.file.data_type.DataType.LONG_LONG_TYPE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="imagesplit.file.data_type.DataType.LONG_TYPE">
+<code class="sig-name descname"><span class="pre">LONG_TYPE</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'long'</span></em><a class="headerlink" href="#imagesplit.file.data_type.DataType.LONG_TYPE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="imagesplit.file.data_type.DataType.RGB_TYPE">
+<code class="sig-name descname"><span class="pre">RGB_TYPE</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'rgb'</span></em><a class="headerlink" href="#imagesplit.file.data_type.DataType.RGB_TYPE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="imagesplit.file.data_type.DataType.SHORT_TYPE">
+<code class="sig-name descname"><span class="pre">SHORT_TYPE</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'short'</span></em><a class="headerlink" href="#imagesplit.file.data_type.DataType.SHORT_TYPE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="imagesplit.file.data_type.DataType.UCHAR_TYPE">
+<code class="sig-name descname"><span class="pre">UCHAR_TYPE</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'uchar'</span></em><a class="headerlink" href="#imagesplit.file.data_type.DataType.UCHAR_TYPE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="imagesplit.file.data_type.DataType.ULONG_LONG_TYPE">
+<code class="sig-name descname"><span class="pre">ULONG_LONG_TYPE</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'ulonglong'</span></em><a class="headerlink" href="#imagesplit.file.data_type.DataType.ULONG_LONG_TYPE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="imagesplit.file.data_type.DataType.ULONG_TYPE">
+<code class="sig-name descname"><span class="pre">ULONG_TYPE</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'ulong'</span></em><a class="headerlink" href="#imagesplit.file.data_type.DataType.ULONG_TYPE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="imagesplit.file.data_type.DataType.USHORT_TYPE">
+<code class="sig-name descname"><span class="pre">USHORT_TYPE</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'ushort'</span></em><a class="headerlink" href="#imagesplit.file.data_type.DataType.USHORT_TYPE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="imagesplit.file.data_type.DataType.from_metaio">
+<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">from_metaio</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metaio_type_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">byte_order_msb</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/file/data_type.html#DataType.from_metaio"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.file.data_type.DataType.from_metaio" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a DataType from a MetaIO data type string</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="imagesplit.file.data_type.DataType.from_vge">
+<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">from_vge</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vge_type_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/file/data_type.html#DataType.from_vge"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.file.data_type.DataType.from_vge" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a DataType from a vge header data type string</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="imagesplit.file.data_type.DataType.get_is_imagej">
+<code class="sig-name descname"><span class="pre">get_is_imagej</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/file/data_type.html#DataType.get_is_imagej"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.file.data_type.DataType.get_is_imagej" title="Permalink to this definition">¶</a></dt>
+<dd><p>True if this datatype is an RGB format</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="imagesplit.file.data_type.DataType.get_is_rgb">
+<code class="sig-name descname"><span class="pre">get_is_rgb</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/file/data_type.html#DataType.get_is_rgb"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.file.data_type.DataType.get_is_rgb" title="Permalink to this definition">¶</a></dt>
+<dd><p>True if this datatype is an RGB format</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="imagesplit.file.data_type.DataType.get_numpy_format">
+<code class="sig-name descname"><span class="pre">get_numpy_format</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/file/data_type.html#DataType.get_numpy_format"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.file.data_type.DataType.get_numpy_format" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a numpy data format string for this data type</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="imagesplit.file.data_type.DataType.metaio_from_name">
+<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">metaio_from_name</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/file/data_type.html#DataType.metaio_from_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.file.data_type.DataType.metaio_from_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the MetaIO name string from a DataType string</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="imagesplit.file.data_type.DataType.name_from_metaio">
+<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">name_from_metaio</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metaio_type_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/file/data_type.html#DataType.name_from_metaio"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.file.data_type.DataType.name_from_metaio" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a DataType string from a MetaIO data type string</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="imagesplit.file.data_type.DataType.name_from_vge">
+<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">name_from_vge</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vge_type_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/file/data_type.html#DataType.name_from_vge"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.file.data_type.DataType.name_from_vge" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a DataType string from a vge data type string</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="imagesplit.file.data_type.DataType.types">
+<code class="sig-name descname"><span class="pre">types</span></code><em class="property"> <span class="pre">=</span> <span class="pre">{'char':</span> <span class="pre">&lt;imagesplit.file.data_type.DataTypeTemplate</span> <span class="pre">object&gt;,</span> <span class="pre">'double':</span> <span class="pre">&lt;imagesplit.file.data_type.DataTypeTemplate</span> <span class="pre">object&gt;,</span> <span class="pre">'float':</span> <span class="pre">&lt;imagesplit.file.data_type.DataTypeTemplate</span> <span class="pre">object&gt;,</span> <span class="pre">'long':</span> <span class="pre">&lt;imagesplit.file.data_type.DataTypeTemplate</span> <span class="pre">object&gt;,</span> <span class="pre">'longlong':</span> <span class="pre">&lt;imagesplit.file.data_type.DataTypeTemplate</span> <span class="pre">object&gt;,</span> <span class="pre">'rgb':</span> <span class="pre">&lt;imagesplit.file.data_type.DataTypeTemplate</span> <span class="pre">object&gt;,</span> <span class="pre">'short':</span> <span class="pre">&lt;imagesplit.file.data_type.DataTypeTemplate</span> <span class="pre">object&gt;,</span> <span class="pre">'uchar':</span> <span class="pre">&lt;imagesplit.file.data_type.DataTypeTemplate</span> <span class="pre">object&gt;,</span> <span class="pre">'ulong':</span> <span class="pre">&lt;imagesplit.file.data_type.DataTypeTemplate</span> <span class="pre">object&gt;,</span> <span class="pre">'ulonglong':</span> <span class="pre">&lt;imagesplit.file.data_type.DataTypeTemplate</span> <span class="pre">object&gt;,</span> <span class="pre">'ushort':</span> <span class="pre">&lt;imagesplit.file.data_type.DataTypeTemplate</span> <span class="pre">object&gt;}</span></em><a class="headerlink" href="#imagesplit.file.data_type.DataType.types" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="imagesplit.file.data_type.DataTypeTemplate">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">imagesplit.file.data_type.</span></code><code class="sig-name descname"><span class="pre">DataTypeTemplate</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bytes_per_voxel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">numpy_base</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metaio_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vge_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_rgb</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/file/data_type.html#DataTypeTemplate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.file.data_type.DataTypeTemplate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Data format paramaters for standard data types</p>
+</dd></dl>
+
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/giftsurg-icon.png" alt="Logo"/>
+            </a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/imagesplit.file.data_type.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">ImageSplit  documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">imagesplit.file.data_type module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, UCL.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.5.1.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,27 @@
+imagesplit.file package
+=======================
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 4
+
+   imagesplit.file.data_type
+   imagesplit.file.file_factory
+   imagesplit.file.file_formats
+   imagesplit.file.file_image_descriptor
+   imagesplit.file.file_wrapper
+   imagesplit.file.format_factory
+   imagesplit.file.image_file_reader
+   imagesplit.file.metaio_reader
+   imagesplit.file.tiff_file_reader
+   imagesplit.file.vol_reader
+
+Module contents
+---------------
+
+.. automodule:: imagesplit.file
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -1,0 +1,195 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>imagesplit.utils.file_descriptor module &#8212; ImageSplit  documentation</title>
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">ImageSplit  documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">imagesplit.utils.file_descriptor module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-imagesplit.utils.file_descriptor">
+<span id="imagesplit-utils-file-descriptor-module"></span><h1>imagesplit.utils.file_descriptor module<a class="headerlink" href="#module-imagesplit.utils.file_descriptor" title="Permalink to this headline">¶</a></h1>
+<p>Wrapper for sub images that form part of a larger volume</p>
+<p>Author: Tom Doel
+Copyright UCL 2017</p>
+<dl class="py class">
+<dt id="imagesplit.utils.file_descriptor.GlobalImageDescriptor">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">imagesplit.utils.file_descriptor.</span></code><code class="sig-name descname"><span class="pre">GlobalImageDescriptor</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_format</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dim_order_condensed</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">msb</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">voxel_size</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/utils/file_descriptor.html#GlobalImageDescriptor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.utils.file_descriptor.GlobalImageDescriptor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Describes a full combined image</p>
+</dd></dl>
+
+<dl class="py class">
+<dt id="imagesplit.utils.file_descriptor.SubImageDescriptor">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">imagesplit.utils.file_descriptor.</span></code><code class="sig-name descname"><span class="pre">SubImageDescriptor</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_format</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">template</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ranges</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dim_order_condensed</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">suffix</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">msb</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compression</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">voxel_size</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/utils/file_descriptor.html#SubImageDescriptor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.utils.file_descriptor.SubImageDescriptor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Describes an image in relation to a larger image</p>
+<dl class="py method">
+<dt id="imagesplit.utils.file_descriptor.SubImageDescriptor.from_dict">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">from_dict</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">descriptor_dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/utils/file_descriptor.html#SubImageDescriptor.from_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.utils.file_descriptor.SubImageDescriptor.from_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create SubImageDescriptor from dictionary entries</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="imagesplit.utils.file_descriptor.SubImageDescriptor.get_local_origin">
+<code class="sig-name descname"><span class="pre">get_local_origin</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/utils/file_descriptor.html#SubImageDescriptor.get_local_origin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.utils.file_descriptor.SubImageDescriptor.get_local_origin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transpose the subimage origin to the local coordinate system</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="imagesplit.utils.file_descriptor.SubImageDescriptor.get_local_size">
+<code class="sig-name descname"><span class="pre">get_local_size</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/utils/file_descriptor.html#SubImageDescriptor.get_local_size"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.utils.file_descriptor.SubImageDescriptor.get_local_size" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transpose the subimage size to the local coordinate system</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="imagesplit.utils.file_descriptor.SubImageDescriptor.get_local_voxel_size">
+<code class="sig-name descname"><span class="pre">get_local_voxel_size</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/utils/file_descriptor.html#SubImageDescriptor.get_local_voxel_size"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.utils.file_descriptor.SubImageDescriptor.get_local_voxel_size" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transpose the subimage origin to the local coordinate system</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="imagesplit.utils.file_descriptor.SubImageDescriptor.to_dict">
+<code class="sig-name descname"><span class="pre">to_dict</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/utils/file_descriptor.html#SubImageDescriptor.to_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.utils.file_descriptor.SubImageDescriptor.to_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a dictionary for the metadata for this subimage</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="imagesplit.utils.file_descriptor.SubImageRanges">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">imagesplit.utils.file_descriptor.</span></code><code class="sig-name descname"><span class="pre">SubImageRanges</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ranges</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/utils/file_descriptor.html#SubImageRanges"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.utils.file_descriptor.SubImageRanges" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Convert range arrays to image parameters</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="imagesplit.utils.file_descriptor.convert_to_descriptors">
+<code class="sig-prename descclassname"><span class="pre">imagesplit.utils.file_descriptor.</span></code><code class="sig-name descname"><span class="pre">convert_to_descriptors</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">descriptors_dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/utils/file_descriptor.html#convert_to_descriptors"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.utils.file_descriptor.convert_to_descriptors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert descriptor dictionary to list of SubImageDescriptor objects</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="imagesplit.utils.file_descriptor.convert_to_dict">
+<code class="sig-prename descclassname"><span class="pre">imagesplit.utils.file_descriptor.</span></code><code class="sig-name descname"><span class="pre">convert_to_dict</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">descriptors</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/utils/file_descriptor.html#convert_to_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.utils.file_descriptor.convert_to_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert SubImageDescriptor objects to descriptor dictionary</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="imagesplit.utils.file_descriptor.generate_input_descriptors">
+<code class="sig-prename descclassname"><span class="pre">imagesplit.utils.file_descriptor.</span></code><code class="sig-name descname"><span class="pre">generate_input_descriptors</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_index</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/utils/file_descriptor.html#generate_input_descriptors"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.utils.file_descriptor.generate_input_descriptors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create descriptors for one or more input files that do not have a
+descriptor file</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="imagesplit.utils.file_descriptor.generate_output_descriptors">
+<code class="sig-prename descclassname"><span class="pre">imagesplit.utils.file_descriptor.</span></code><code class="sig-name descname"><span class="pre">generate_output_descriptors</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename_out_base</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_block_size_voxels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overlap_size_voxels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dim_order</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">header</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_dims</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_file_format</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">msb</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compression</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">voxel_size</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/utils/file_descriptor.html#generate_output_descriptors"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.utils.file_descriptor.generate_output_descriptors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates descriptors representing file output</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="imagesplit.utils.file_descriptor.header_from_descriptor">
+<code class="sig-prename descclassname"><span class="pre">imagesplit.utils.file_descriptor.</span></code><code class="sig-name descname"><span class="pre">header_from_descriptor</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">descriptor_filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename_override</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/utils/file_descriptor.html#header_from_descriptor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.utils.file_descriptor.header_from_descriptor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a file header based on descriptor information</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="imagesplit.utils.file_descriptor.load_descriptor">
+<code class="sig-prename descclassname"><span class="pre">imagesplit.utils.file_descriptor.</span></code><code class="sig-name descname"><span class="pre">load_descriptor</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">descriptor_filename</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/utils/file_descriptor.html#load_descriptor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.utils.file_descriptor.load_descriptor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads and parses a file descriptor from disk</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="imagesplit.utils.file_descriptor.parse_header">
+<code class="sig-prename descclassname"><span class="pre">imagesplit.utils.file_descriptor.</span></code><code class="sig-name descname"><span class="pre">parse_header</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">factory</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/utils/file_descriptor.html#parse_header"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.utils.file_descriptor.parse_header" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read metadata from any supported header type</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="imagesplit.utils.file_descriptor.write_descriptor_file">
+<code class="sig-prename descclassname"><span class="pre">imagesplit.utils.file_descriptor.</span></code><code class="sig-name descname"><span class="pre">write_descriptor_file</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">descriptors_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">descriptors_out</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename_out_base</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/utils/file_descriptor.html#write_descriptor_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.utils.file_descriptor.write_descriptor_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Saves descriptor files</p>
+</dd></dl>
+
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/giftsurg-icon.png" alt="Logo"/>
+            </a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/imagesplit.utils.file_descriptor.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">ImageSplit  documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">imagesplit.utils.file_descriptor module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, UCL.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.5.1.
+    </div>
+  </body>
+</html>

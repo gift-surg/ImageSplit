@@ -1,0 +1,125 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>imagesplit.applications.split_files module &#8212; ImageSplit  documentation</title>
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">ImageSplit  documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">imagesplit.applications.split_files module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-imagesplit.applications.split_files">
+<span id="imagesplit-applications-split-files-module"></span><h1>imagesplit.applications.split_files module<a class="headerlink" href="#module-imagesplit.applications.split_files" title="Permalink to this headline">¶</a></h1>
+<p>Utility for splitting large images into subimages</p>
+<p>Author: Tom Doel
+Copyright UCL 2017</p>
+<dl class="py function">
+<dt id="imagesplit.applications.split_files.main">
+<code class="sig-prename descclassname"><span class="pre">imagesplit.applications.split_files.</span></code><code class="sig-name descname"><span class="pre">main</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/applications/split_files.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.applications.split_files.main" title="Permalink to this definition">¶</a></dt>
+<dd><p>Utility for splitting images into subimages</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="imagesplit.applications.split_files.parse_slice_output">
+<code class="sig-prename descclassname"><span class="pre">imagesplit.applications.split_files.</span></code><code class="sig-name descname"><span class="pre">parse_slice_output</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dim_order</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_block_size_voxels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overlap_size_voxels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slice_output</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/applications/split_files.html#parse_slice_output"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.applications.split_files.parse_slice_output" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get output parameters for splitting into slices along axis</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="imagesplit.applications.split_files.specify_input_descriptors">
+<code class="sig-prename descclassname"><span class="pre">imagesplit.applications.split_files.</span></code><code class="sig-name descname"><span class="pre">specify_input_descriptors</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">descriptor_filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_file_base</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename_override</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/applications/split_files.html#specify_input_descriptors"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.applications.split_files.specify_input_descriptors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute input parameters based on input files and/or descriptor files</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="imagesplit.applications.split_files.specify_output_descriptors">
+<code class="sig-prename descclassname"><span class="pre">imagesplit.applications.split_files.</span></code><code class="sig-name descname"><span class="pre">specify_output_descriptors</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dim_order</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename_out_base</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">global_descriptor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">header</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_block_size_voxels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_compression</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_format</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overlap_size_voxels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slice_output</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/applications/split_files.html#specify_output_descriptors"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.applications.split_files.specify_output_descriptors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute output parameters based on a set of parameters</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="imagesplit.applications.split_files.split_file">
+<code class="sig-prename descclassname"><span class="pre">imagesplit.applications.split_files.</span></code><code class="sig-name descname"><span class="pre">split_file</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_file_base</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename_out_base</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dim_order</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_handle_factory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_format</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slice_output</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rescale</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_compression</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_block_size_voxels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overlap_size_voxels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">descriptor_filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/applications/split_files.html#split_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.applications.split_files.split_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Saves the specified image file as a number of smaller files</p>
+</dd></dl>
+
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/giftsurg-icon.png" alt="Logo"/>
+            </a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/imagesplit.applications.split_files.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">ImageSplit  documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">imagesplit.applications.split_files module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, UCL.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.5.1.
+    </div>
+  </body>
+</html>

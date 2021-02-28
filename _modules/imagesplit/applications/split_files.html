@@ -1,0 +1,363 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>imagesplit.applications.split_files &#8212; ImageSplit  documentation</title>
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/classic.css" type="text/css" />
+    
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">ImageSplit  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">imagesplit.applications.split_files</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for imagesplit.applications.split_files</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="c1"># coding=utf-8</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Utility for splitting large images into subimages</span>
+
+<span class="sd">Author: Tom Doel</span>
+<span class="sd">Copyright UCL 2017</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
+
+<span class="kn">import</span> <span class="nn">argparse</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="kn">from</span> <span class="nn">imagesplit.file.file_factory</span> <span class="kn">import</span> <span class="n">FileFactory</span>
+<span class="kn">from</span> <span class="nn">imagesplit.file.file_wrapper</span> <span class="kn">import</span> <span class="n">FileHandleFactory</span>
+<span class="kn">from</span> <span class="nn">imagesplit.utils.file_descriptor</span> <span class="kn">import</span> <span class="n">write_descriptor_file</span><span class="p">,</span> \
+    <span class="n">generate_output_descriptors</span><span class="p">,</span> <span class="n">generate_input_descriptors</span><span class="p">,</span> \
+    <span class="n">header_from_descriptor</span>
+<span class="kn">from</span> <span class="nn">imagesplit.applications.write_files</span> <span class="kn">import</span> <span class="n">write_files</span>
+
+<span class="c1"># pylint: disable=too-many-arguments</span>
+<span class="kn">from</span> <span class="nn">imagesplit.utils.versioning</span> <span class="kn">import</span> <span class="n">get_version_string</span>
+
+
+<div class="viewcode-block" id="split_file"><a class="viewcode-back" href="../../../imagesplit.applications.split_files.html#imagesplit.applications.split_files.split_file">[docs]</a><span class="k">def</span> <span class="nf">split_file</span><span class="p">(</span><span class="n">input_file_base</span><span class="p">,</span> <span class="n">filename_out_base</span><span class="p">,</span> <span class="n">start_index</span><span class="p">,</span> <span class="n">output_type</span><span class="p">,</span>
+               <span class="n">dim_order</span><span class="p">,</span> <span class="n">file_handle_factory</span><span class="p">,</span> <span class="n">output_format</span><span class="p">,</span> <span class="n">slice_output</span><span class="p">,</span>
+               <span class="n">rescale</span><span class="p">,</span> <span class="n">out_compression</span><span class="p">,</span> <span class="n">max_block_size_voxels</span><span class="p">,</span>
+               <span class="n">overlap_size_voxels</span><span class="p">,</span> <span class="n">descriptor_filename</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">test</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Saves the specified image file as a number of smaller files&quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">filename_out_base</span><span class="p">:</span>
+        <span class="n">input_file_base</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">input_file_base</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">filename_out_base</span> <span class="o">=</span> <span class="n">input_file_base</span> <span class="o">+</span> <span class="s2">&quot;_split&quot;</span>
+
+    <span class="k">if</span> <span class="n">rescale</span> <span class="ow">and</span> <span class="n">rescale</span> <span class="o">!=</span> <span class="s2">&quot;limits&quot;</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">rescale</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Rescale must have no arguments, or a min and max&#39;</span><span class="p">)</span>
+
+    <span class="n">descriptors_in</span><span class="p">,</span> <span class="n">global_descriptor</span><span class="p">,</span> <span class="n">header</span> <span class="o">=</span> <span class="n">specify_input_descriptors</span><span class="p">(</span>
+        <span class="n">descriptor_filename</span><span class="p">,</span> <span class="n">input_file_base</span><span class="p">,</span> <span class="n">start_index</span><span class="p">,</span> <span class="n">input_file_base</span><span class="p">)</span>
+
+    <span class="n">descriptors_out</span> <span class="o">=</span> <span class="n">specify_output_descriptors</span><span class="p">(</span>
+        <span class="n">dim_order</span><span class="p">,</span>
+        <span class="n">filename_out_base</span><span class="p">,</span>
+        <span class="n">global_descriptor</span><span class="p">,</span>
+        <span class="n">header</span><span class="p">,</span>
+        <span class="n">max_block_size_voxels</span><span class="p">,</span>
+        <span class="n">out_compression</span><span class="p">,</span>
+        <span class="n">output_format</span><span class="p">,</span>
+        <span class="n">output_type</span><span class="p">,</span>
+        <span class="n">overlap_size_voxels</span><span class="p">,</span>
+        <span class="n">slice_output</span>
+    <span class="p">)</span>
+
+    <span class="n">file_factory</span> <span class="o">=</span> <span class="n">FileFactory</span><span class="p">(</span><span class="n">file_handle_factory</span><span class="p">)</span>
+
+    <span class="n">write_files</span><span class="p">(</span><span class="n">descriptors_in</span><span class="p">,</span> <span class="n">descriptors_out</span><span class="p">,</span> <span class="n">file_factory</span><span class="p">,</span> <span class="n">rescale</span><span class="p">,</span> <span class="n">test</span><span class="p">)</span>
+
+    <span class="c1"># Write out descriptor if one does not already exist</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">descriptor_filename</span><span class="p">:</span>
+        <span class="n">write_descriptor_file</span><span class="p">(</span><span class="n">descriptors_in</span><span class="p">,</span> <span class="n">descriptors_out</span><span class="p">,</span>
+                              <span class="n">filename_out_base</span><span class="p">,</span> <span class="n">test</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="specify_input_descriptors"><a class="viewcode-back" href="../../../imagesplit.applications.split_files.html#imagesplit.applications.split_files.specify_input_descriptors">[docs]</a><span class="k">def</span> <span class="nf">specify_input_descriptors</span><span class="p">(</span><span class="n">descriptor_filename</span><span class="p">,</span> <span class="n">input_file_base</span><span class="p">,</span>
+                              <span class="n">start_index</span><span class="p">,</span> <span class="n">filename_override</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Compute input parameters based on input files and/or descriptor files&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">descriptor_filename</span><span class="p">:</span>
+        <span class="c1"># pylint: disable=unused-variable</span>
+        <span class="p">[</span><span class="n">header</span><span class="p">,</span> <span class="n">descriptors_in</span><span class="p">,</span> <span class="n">global_descriptor</span><span class="p">]</span> <span class="o">=</span> \
+            <span class="n">generate_input_descriptors</span><span class="p">(</span><span class="n">input_file_base</span><span class="p">,</span> <span class="n">start_index</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="p">[</span><span class="n">header</span><span class="p">,</span> <span class="n">descriptors_in</span><span class="p">,</span> <span class="n">global_descriptor</span><span class="p">]</span> <span class="o">=</span> \
+            <span class="n">header_from_descriptor</span><span class="p">(</span><span class="n">descriptor_filename</span><span class="p">,</span> <span class="n">filename_override</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">descriptors_in</span><span class="p">,</span> <span class="n">global_descriptor</span><span class="p">,</span> <span class="n">header</span></div>
+
+
+<div class="viewcode-block" id="specify_output_descriptors"><a class="viewcode-back" href="../../../imagesplit.applications.split_files.html#imagesplit.applications.split_files.specify_output_descriptors">[docs]</a><span class="k">def</span> <span class="nf">specify_output_descriptors</span><span class="p">(</span><span class="n">dim_order</span><span class="p">,</span> <span class="n">filename_out_base</span><span class="p">,</span> <span class="n">global_descriptor</span><span class="p">,</span>
+                               <span class="n">header</span><span class="p">,</span> <span class="n">max_block_size_voxels</span><span class="p">,</span> <span class="n">out_compression</span><span class="p">,</span>
+                               <span class="n">output_format</span><span class="p">,</span> <span class="n">output_type</span><span class="p">,</span> <span class="n">overlap_size_voxels</span><span class="p">,</span>
+                               <span class="n">slice_output</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Compute output parameters based on a set of parameters&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">output_format</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">output_format</span> <span class="o">=</span> <span class="n">global_descriptor</span><span class="o">.</span><span class="n">file_format</span>
+    <span class="k">if</span> <span class="n">output_type</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">output_type</span> <span class="o">=</span> <span class="n">global_descriptor</span><span class="o">.</span><span class="n">data_type</span>
+    <span class="k">if</span> <span class="n">out_compression</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">out_compression</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">dim_order</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">dim_order</span> <span class="o">=</span> <span class="n">global_descriptor</span><span class="o">.</span><span class="n">axis</span><span class="o">.</span><span class="n">to_condensed_format</span><span class="p">()</span>
+    <span class="n">dim_order</span><span class="p">,</span> <span class="n">max_block_size_voxels</span><span class="p">,</span> <span class="n">overlap_size_voxels</span> <span class="o">=</span> <span class="n">parse_slice_output</span><span class="p">(</span>
+        <span class="n">dim_order</span><span class="p">,</span> <span class="n">max_block_size_voxels</span><span class="p">,</span> <span class="n">overlap_size_voxels</span><span class="p">,</span> <span class="n">slice_output</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">max_block_size_voxels</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">max_block_size_voxels</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="k">if</span> <span class="n">overlap_size_voxels</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">overlap_size_voxels</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">out_msb</span> <span class="o">=</span> <span class="n">global_descriptor</span><span class="o">.</span><span class="n">msb</span>
+    <span class="n">voxel_size</span> <span class="o">=</span> <span class="n">global_descriptor</span><span class="o">.</span><span class="n">voxel_size</span>
+    <span class="n">descriptors_out</span> <span class="o">=</span> <span class="n">generate_output_descriptors</span><span class="p">(</span>
+        <span class="n">filename_out_base</span><span class="o">=</span><span class="n">filename_out_base</span><span class="p">,</span>
+        <span class="n">max_block_size_voxels</span><span class="o">=</span><span class="n">max_block_size_voxels</span><span class="p">,</span>
+        <span class="n">overlap_size_voxels</span><span class="o">=</span><span class="n">overlap_size_voxels</span><span class="p">,</span>
+        <span class="n">dim_order</span><span class="o">=</span><span class="n">dim_order</span><span class="p">,</span>
+        <span class="n">header</span><span class="o">=</span><span class="n">header</span><span class="p">,</span>
+        <span class="n">output_type</span><span class="o">=</span><span class="n">output_type</span><span class="p">,</span>
+        <span class="n">output_file_format</span><span class="o">=</span><span class="n">output_format</span><span class="p">,</span>
+        <span class="n">num_dims</span><span class="o">=</span><span class="n">global_descriptor</span><span class="o">.</span><span class="n">num_dims</span><span class="p">,</span>
+        <span class="n">image_size</span><span class="o">=</span><span class="n">global_descriptor</span><span class="o">.</span><span class="n">size</span><span class="p">,</span>
+        <span class="n">msb</span><span class="o">=</span><span class="n">out_msb</span><span class="p">,</span>
+        <span class="n">compression</span><span class="o">=</span><span class="n">out_compression</span><span class="p">,</span>
+        <span class="n">voxel_size</span><span class="o">=</span><span class="n">voxel_size</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">descriptors_out</span></div>
+
+
+<div class="viewcode-block" id="parse_slice_output"><a class="viewcode-back" href="../../../imagesplit.applications.split_files.html#imagesplit.applications.split_files.parse_slice_output">[docs]</a><span class="k">def</span> <span class="nf">parse_slice_output</span><span class="p">(</span><span class="n">dim_order</span><span class="p">,</span> <span class="n">max_block_size_voxels</span><span class="p">,</span> <span class="n">overlap_size_voxels</span><span class="p">,</span>
+                       <span class="n">slice_output</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get output parameters for splitting into slices along axis&quot;&quot;&quot;</span>
+    <span class="n">new_dim_order</span> <span class="o">=</span> <span class="n">dim_order</span>
+    <span class="k">if</span> <span class="n">slice_output</span><span class="p">:</span>
+        <span class="n">slice_output</span> <span class="o">=</span> <span class="n">slice_output</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">slice_output</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;s&quot;</span><span class="p">:</span>
+            <span class="n">new_dim_order</span> <span class="o">=</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+            <span class="n">max_block_size_voxels</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">overlap_size_voxels</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="n">slice_output</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;c&quot;</span><span class="p">:</span>
+            <span class="n">new_dim_order</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
+            <span class="n">max_block_size_voxels</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">overlap_size_voxels</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="n">slice_output</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;a&quot;</span><span class="p">:</span>
+            <span class="n">new_dim_order</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
+            <span class="n">max_block_size_voxels</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+            <span class="n">overlap_size_voxels</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="n">slice_output</span> <span class="o">==</span> <span class="s2">&quot;1&quot;</span><span class="p">:</span>
+            <span class="n">new_dim_order</span> <span class="o">=</span> <span class="p">[</span><span class="n">dim_order</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="o">-</span><span class="n">dim_order</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">dim_order</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+            <span class="n">max_block_size_voxels</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">max_block_size_voxels</span><span class="p">[</span><span class="nb">abs</span><span class="p">(</span><span class="n">dim_order</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="n">overlap_size_voxels</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="n">slice_output</span> <span class="o">==</span> <span class="s2">&quot;2&quot;</span><span class="p">:</span>
+            <span class="n">new_dim_order</span> <span class="o">=</span> <span class="p">[</span><span class="n">dim_order</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="o">-</span><span class="n">dim_order</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">dim_order</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
+            <span class="n">max_block_size_voxels</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">max_block_size_voxels</span><span class="p">[</span><span class="nb">abs</span><span class="p">(</span><span class="n">dim_order</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="n">overlap_size_voxels</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="n">slice_output</span> <span class="o">==</span> <span class="s2">&quot;3&quot;</span><span class="p">:</span>
+            <span class="n">new_dim_order</span> <span class="o">=</span> <span class="p">[</span><span class="n">dim_order</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">dim_order</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">dim_order</span><span class="p">[</span><span class="mi">2</span><span class="p">]]</span>
+            <span class="n">max_block_size_voxels</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">max_block_size_voxels</span><span class="p">[</span><span class="nb">abs</span><span class="p">(</span><span class="n">dim_order</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="n">overlap_size_voxels</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unknown slice parameter &quot;</span> <span class="o">+</span> <span class="n">slice_output</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">new_dim_order</span><span class="p">,</span> <span class="n">max_block_size_voxels</span><span class="p">,</span> <span class="n">overlap_size_voxels</span></div>
+
+
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../../../imagesplit.applications.split_files.html#imagesplit.applications.split_files.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Utility for splitting images into subimages&quot;&quot;&quot;</span>
+
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span>
+        <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Splits a large file into slices or blocks with overlap&#39;</span><span class="p">)</span>
+
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-i&quot;</span><span class="p">,</span> <span class="s2">&quot;--input&quot;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;_no_filename_specified&quot;</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Name of input file, or filename prefix for a &quot;</span>
+                             <span class="s2">&quot;set of files&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-o&quot;</span><span class="p">,</span> <span class="s2">&quot;--out&quot;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Name of output file, or filename prefix if more &quot;</span>
+                             <span class="s2">&quot;than one file is output&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-l&quot;</span><span class="p">,</span> <span class="s2">&quot;--overlap&quot;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                        <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Number of voxels to overlap between output &quot;</span>
+                             <span class="s2">&quot;images. If not specified, output images will not &quot;</span>
+                             <span class="s2">&quot;overlap&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-m&quot;</span><span class="p">,</span> <span class="s2">&quot;--max&quot;</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=</span><span class="s1">&#39;+&#39;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                        <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Maximum number of voxels in each dimension in &quot;</span>
+                             <span class="s2">&quot;each output file. Can be a scalar or vector &quot;</span>
+                             <span class="s2">&quot;corresponding to each image dimension. The file &quot;</span>
+                             <span class="s2">&quot;will be optimally split such that each file &quot;</span>
+                             <span class="s2">&quot;output dimension is less than or equal to this &quot;</span>
+                             <span class="s2">&quot;maximum.&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-x&quot;</span><span class="p">,</span> <span class="s2">&quot;--startindex&quot;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                        <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Start index for filename suffix when loading or &quot;</span>
+                             <span class="s2">&quot;saving a sequence of files&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-t&quot;</span><span class="p">,</span> <span class="s2">&quot;--type&quot;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Output data type (default: same as input file &quot;</span>
+                             <span class="s2">&quot;datatype)&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-f&quot;</span><span class="p">,</span> <span class="s2">&quot;--format&quot;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                        <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Output file format such as mhd, tiff &quot;</span>
+                             <span class="s2">&quot;(default: same as input file format)&quot;</span><span class="p">)</span>
+
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-r&quot;</span><span class="p">,</span> <span class="s2">&quot;--rescale&quot;</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=</span><span class="s1">&#39;*&#39;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Rescale image between the specified min and max &quot;</span>
+                             <span class="s2">&quot;values. If no values are specified, use the &quot;</span>
+                             <span class="s2">&quot;volume limits.&quot;</span><span class="p">)</span>
+
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-z&quot;</span><span class="p">,</span> <span class="s2">&quot;--compress&quot;</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=</span><span class="s1">&#39;?&#39;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                        <span class="n">const</span><span class="o">=</span><span class="s1">&#39;default&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Enables compression (default no compression). &quot;</span>
+                             <span class="s2">&quot;Valid values depend on the output file format. &quot;</span>
+                             <span class="s2">&quot;-z with no extra argument will choose a suitable &quot;</span>
+                             <span class="s2">&quot;compression for this file format. &quot;</span>
+                             <span class="s2">&quot;For TIFF files, the default is Adboe deflat and &quot;</span>
+                             <span class="s2">&quot;other valid values are those supported by PIL.&quot;</span><span class="p">)</span>
+
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-s&quot;</span><span class="p">,</span> <span class="s2">&quot;--slice&quot;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                        <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Divide image into slices along the specified &quot;</span>
+                             <span class="s2">&quot;axis. Choose 1, 2, 3 etc to select an axis &quot;</span>
+                             <span class="s2">&quot;relative to the current image orientation, or &quot;</span>
+                             <span class="s2">&quot;c, s, a to select an absolute orientation.&quot;</span>
+                             <span class="s2">&quot;This argument cannot be used with --axis, --max &quot;</span>
+                             <span class="s2">&quot;or --overlap.&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-a&quot;</span><span class="p">,</span> <span class="s2">&quot;--axis&quot;</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=</span><span class="s1">&#39;+&#39;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Axis ordering (default 1 2 3). Specifies the &quot;</span>
+                             <span class="s2">&quot;global axis corresponding to each dimension &quot;</span>
+                             <span class="s2">&quot;in the image file. The first value is the &quot;</span>
+                             <span class="s2">&quot;global axis represented by the first dimension &quot;</span>
+                             <span class="s2">&quot;in the file, and so on. One value for each &quot;</span>
+                             <span class="s2">&quot;dimension, dimensions are numbered 1,2,3,&quot;</span>
+                             <span class="s2">&quot;... and a negative value means that axis is &quot;</span>
+                             <span class="s2">&quot;flipped. This cannot be used with --slice&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-d&quot;</span><span class="p">,</span> <span class="s2">&quot;--descriptor&quot;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Name of descriptor file (.gift) which defines &quot;</span>
+                             <span class="s2">&quot;the file splitting&quot;</span><span class="p">)</span>
+
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--test&quot;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                        <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;If set, No writing will be performed to the &quot;</span>
+                             <span class="s2">&quot;output files&quot;</span><span class="p">)</span>
+
+    <span class="n">version_string</span> <span class="o">=</span> <span class="n">get_version_string</span><span class="p">()</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">&quot;-v&quot;</span><span class="p">,</span> <span class="s2">&quot;--version&quot;</span><span class="p">,</span>
+        <span class="n">action</span><span class="o">=</span><span class="s1">&#39;version&#39;</span><span class="p">,</span>
+        <span class="n">version</span><span class="o">=</span><span class="n">version_string</span><span class="p">)</span>
+
+    <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+
+    <span class="n">rescale</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">rescale</span>
+
+    <span class="c1"># Code inspection suggests &quot;if not rescale&quot;, but that is wrong.</span>
+    <span class="c1"># We only set to &quot;limits&quot; if rescale is [], ie set without a range,</span>
+    <span class="c1"># whereas if rescale is None (not set) we keep it as None</span>
+    <span class="c1">#</span>
+    <span class="c1"># noinspection PySimplifyBooleanCheck</span>
+    <span class="k">if</span> <span class="n">rescale</span> <span class="o">==</span> <span class="p">[]:</span>  <span class="c1"># rescale is set on command line but not given a range</span>
+        <span class="n">rescale</span> <span class="o">=</span> <span class="s1">&#39;limits&#39;</span>
+
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">slice</span> <span class="ow">and</span> <span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">axis</span> <span class="ow">or</span> <span class="n">args</span><span class="o">.</span><span class="n">max</span> <span class="ow">or</span> <span class="n">args</span><span class="o">.</span><span class="n">overlap</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Cannot use --slice with --axis, --max or --overlap&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">input</span> <span class="o">==</span> <span class="s1">&#39;_no_filename_specified&#39;</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;No filename was specified&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span> <span class="o">&gt;=</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">7</span><span class="p">)</span>
+        <span class="n">split_file</span><span class="p">(</span><span class="n">input_file_base</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">input</span><span class="p">,</span>
+                   <span class="n">filename_out_base</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">out</span><span class="p">,</span>
+                   <span class="n">start_index</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">startindex</span><span class="p">,</span>
+                   <span class="n">output_type</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">type</span><span class="p">,</span>
+                   <span class="n">dim_order</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">axis</span><span class="p">,</span>
+                   <span class="n">file_handle_factory</span><span class="o">=</span><span class="n">FileHandleFactory</span><span class="p">(),</span>
+                   <span class="n">output_format</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">format</span><span class="p">,</span>
+                   <span class="n">slice_output</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">slice</span><span class="p">,</span>
+                   <span class="n">rescale</span><span class="o">=</span><span class="n">rescale</span><span class="p">,</span>
+                   <span class="n">out_compression</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">compress</span><span class="p">,</span>
+                   <span class="n">max_block_size_voxels</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">max</span><span class="p">,</span>
+                   <span class="n">overlap_size_voxels</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">overlap</span><span class="p">,</span>
+                   <span class="n">descriptor_filename</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">descriptor</span><span class="p">,</span>
+                   <span class="n">test</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">test</span><span class="p">)</span></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../../index.html">
+              <img class="logo" src="../../../_static/giftsurg-icon.png" alt="Logo"/>
+            </a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">ImageSplit  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">imagesplit.applications.split_files</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, UCL.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.5.1.
+    </div>
+  </body>
+</html>

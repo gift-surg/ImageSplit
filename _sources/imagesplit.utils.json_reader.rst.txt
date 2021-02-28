@@ -1,0 +1,7 @@
+imagesplit.utils.json\_reader module
+====================================
+
+.. automodule:: imagesplit.utils.json_reader
+   :members:
+   :undoc-members:
+   :show-inheritance:

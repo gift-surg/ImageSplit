@@ -1,0 +1,21 @@
+imagesplit package
+==================
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   imagesplit.applications
+   imagesplit.file
+   imagesplit.image
+   imagesplit.utils
+
+Module contents
+---------------
+
+.. automodule:: imagesplit
+   :members:
+   :undoc-members:
+   :show-inheritance:

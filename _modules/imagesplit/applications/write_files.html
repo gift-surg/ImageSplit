@@ -1,0 +1,106 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>imagesplit.applications.write_files &#8212; ImageSplit  documentation</title>
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/classic.css" type="text/css" />
+    
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">ImageSplit  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">imagesplit.applications.write_files</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for imagesplit.applications.write_files</h1><div class="highlight"><pre>
+<span></span><span class="c1"># coding=utf-8</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Wrapper for an image which consists of one or more subimages</span>
+
+<span class="sd">Author: Tom Doel</span>
+<span class="sd">Copyright UCL 2017</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">imagesplit.image.combined_image</span> <span class="kn">import</span> <span class="n">CombinedImage</span>
+
+
+<div class="viewcode-block" id="write_files"><a class="viewcode-back" href="../../../imagesplit.applications.write_files.html#imagesplit.applications.write_files.write_files">[docs]</a><span class="k">def</span> <span class="nf">write_files</span><span class="p">(</span><span class="n">descriptors_in</span><span class="p">,</span> <span class="n">descriptors_out</span><span class="p">,</span> <span class="n">file_factory</span><span class="p">,</span> <span class="n">rescale</span><span class="p">,</span>
+                <span class="n">test</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Creates a set of output files from the input files&quot;&quot;&quot;</span>
+
+    <span class="n">input_combined</span> <span class="o">=</span> <span class="n">CombinedImage</span><span class="p">(</span><span class="n">descriptors_in</span><span class="p">,</span> <span class="n">file_factory</span><span class="p">)</span>
+    <span class="n">output_combined</span> <span class="o">=</span> <span class="n">CombinedImage</span><span class="p">(</span><span class="n">descriptors_out</span><span class="p">,</span> <span class="n">file_factory</span><span class="p">)</span>
+    <span class="n">output_combined</span><span class="o">.</span><span class="n">write_image</span><span class="p">(</span><span class="n">input_combined</span><span class="p">,</span> <span class="n">rescale</span><span class="p">,</span> <span class="n">test</span><span class="p">)</span>
+
+    <span class="n">input_combined</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="n">output_combined</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../../index.html">
+              <img class="logo" src="../../../_static/giftsurg-icon.png" alt="Logo"/>
+            </a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">ImageSplit  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">imagesplit.applications.write_files</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, UCL.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.5.1.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,304 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>imagesplit.image.image_wrapper &#8212; ImageSplit  documentation</title>
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/classic.css" type="text/css" />
+    
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">ImageSplit  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">imagesplit.image.image_wrapper</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for imagesplit.image.image_wrapper</h1><div class="highlight"><pre>
+<span></span><span class="c1"># coding=utf-8</span>
+<span class="sd">&quot;&quot;&quot;A wrapper for a multi-dimensional image with an origin offset&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">abstractmethod</span>
+
+<span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+
+<div class="viewcode-block" id="ImageWrapperBase"><a class="viewcode-back" href="../../../imagesplit.image.image_wrapper.html#imagesplit.image.image_wrapper.ImageWrapperBase">[docs]</a><span class="k">class</span> <span class="nc">ImageWrapperBase</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Multi-dimensional image array with an origin&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">origin</span><span class="p">,</span> <span class="n">image_size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">image</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">origin</span> <span class="o">=</span> <span class="n">origin</span>
+        <span class="k">if</span> <span class="n">image</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">size</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">get_size</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">size</span> <span class="o">=</span> <span class="n">image_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">image</span> <span class="o">=</span> <span class="n">image</span>
+
+<div class="viewcode-block" id="ImageWrapperBase.set_sub_image"><a class="viewcode-back" href="../../../imagesplit.image.image_wrapper.html#imagesplit.image.image_wrapper.ImageWrapperBase.set_sub_image">[docs]</a>    <span class="k">def</span> <span class="nf">set_sub_image</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sub_image</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Replaces part of the image with the corresponding subimage&quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">image</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">image</span> <span class="o">=</span> <span class="n">ImageStorage</span><span class="o">.</span><span class="n">create_empty</span><span class="p">(</span>
+                <span class="n">size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">,</span>
+                <span class="n">dtype</span><span class="o">=</span><span class="n">sub_image</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">get_type</span><span class="p">())</span>
+
+        <span class="c1"># Transform the image to our local coordinate system</span>
+        <span class="n">local_subimage</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform_sub_image</span><span class="p">(</span><span class="n">sub_image</span><span class="p">)</span>
+        <span class="n">start</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform_coords</span><span class="p">(</span><span class="n">sub_image</span><span class="p">)</span>
+
+        <span class="c1"># Test if image is in bounds</span>
+        <span class="n">start_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">origin</span><span class="p">)</span>
+        <span class="n">end_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">start_indices</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">less</span><span class="p">(</span><span class="n">start_indices</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span> \
+                <span class="ow">or</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">greater</span><span class="p">(</span><span class="n">end_indices</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Subimage is not contained within the main image&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Set the part of the image to this subimage</span>
+        <span class="n">selector</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">([</span><span class="nb">slice</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span><span class="p">,</span> <span class="n">e</span> <span class="ow">in</span>
+                          <span class="nb">zip</span><span class="p">(</span><span class="n">start_indices</span><span class="p">,</span> <span class="n">end_indices</span><span class="p">)])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">selector</span><span class="p">,</span> <span class="n">local_subimage</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ImageWrapperBase.transform_coords"><a class="viewcode-back" href="../../../imagesplit.image.image_wrapper.html#imagesplit.image.image_wrapper.ImageWrapperBase.transform_coords">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">transform_coords</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sub_image</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Transforms sub_image start, size to this coordinate system&quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="ImageWrapperBase.transform_sub_image"><a class="viewcode-back" href="../../../imagesplit.image.image_wrapper.html#imagesplit.image.image_wrapper.ImageWrapperBase.transform_sub_image">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">transform_sub_image</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sub_image</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Transforms sub_image to this coordinate system&quot;&quot;&quot;</span>
+        <span class="k">pass</span></div></div>
+
+
+<div class="viewcode-block" id="ImageWrapper"><a class="viewcode-back" href="../../../imagesplit.image.image_wrapper.html#imagesplit.image.image_wrapper.ImageWrapper">[docs]</a><span class="k">class</span> <span class="nc">ImageWrapper</span><span class="p">(</span><span class="n">ImageWrapperBase</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Multi-dimensional image array with an origin&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">origin</span><span class="p">,</span> <span class="n">image_size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">image</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ImageWrapper</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">origin</span><span class="o">=</span><span class="n">origin</span><span class="p">,</span>
+                                           <span class="n">image_size</span><span class="o">=</span><span class="n">image_size</span><span class="p">,</span>
+                                           <span class="n">image</span><span class="o">=</span><span class="n">image</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ImageWrapper.get_sub_image"><a class="viewcode-back" href="../../../imagesplit.image.image_wrapper.html#imagesplit.image.image_wrapper.ImageWrapper.get_sub_image">[docs]</a>    <span class="k">def</span> <span class="nf">get_sub_image</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">size</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the corresponding subimage&quot;&quot;&quot;</span>
+
+        <span class="n">start_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">origin</span><span class="p">)</span>
+        <span class="n">end_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">start_indices</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">size</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">less</span><span class="p">(</span><span class="n">start_indices</span><span class="p">,</span>
+                          <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">start_indices</span><span class="p">)))</span> \
+                <span class="ow">or</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">greater</span><span class="p">(</span><span class="n">end_indices</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Subimage is not contained within the main image&quot;</span><span class="p">)</span>
+        <span class="n">selector</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">([</span><span class="nb">slice</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span><span class="p">,</span> <span class="n">e</span> <span class="ow">in</span>
+                          <span class="nb">zip</span><span class="p">(</span><span class="n">start_indices</span><span class="p">,</span> <span class="n">end_indices</span><span class="p">)])</span>
+        <span class="k">return</span> <span class="n">ImageWrapper</span><span class="p">(</span><span class="n">origin</span><span class="o">=</span><span class="n">start</span><span class="p">,</span> <span class="n">image</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">selector</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="ImageWrapper.transform_coords"><a class="viewcode-back" href="../../../imagesplit.image.image_wrapper.html#imagesplit.image.image_wrapper.ImageWrapper.transform_coords">[docs]</a>    <span class="k">def</span> <span class="nf">transform_coords</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sub_image</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">sub_image</span><span class="o">.</span><span class="n">origin</span><span class="p">,</span> <span class="n">sub_image</span><span class="o">.</span><span class="n">size</span></div>
+
+<div class="viewcode-block" id="ImageWrapper.transform_sub_image"><a class="viewcode-back" href="../../../imagesplit.image.image_wrapper.html#imagesplit.image.image_wrapper.ImageWrapper.transform_sub_image">[docs]</a>    <span class="k">def</span> <span class="nf">transform_sub_image</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sub_image</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">sub_image</span><span class="o">.</span><span class="n">image</span></div></div>
+
+
+<div class="viewcode-block" id="SmartImage"><a class="viewcode-back" href="../../../imagesplit.image.image_wrapper.html#imagesplit.image.image_wrapper.SmartImage">[docs]</a><span class="k">class</span> <span class="nc">SmartImage</span><span class="p">(</span><span class="n">ImageWrapper</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Image wrapper which converts between Axes&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">image</span><span class="p">,</span> <span class="n">transformer</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">SmartImage</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">origin</span><span class="o">=</span><span class="n">start</span><span class="p">,</span> <span class="n">image_size</span><span class="o">=</span><span class="n">size</span><span class="p">,</span>
+                                         <span class="n">image</span><span class="o">=</span><span class="n">image</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">size</span> <span class="o">=</span> <span class="n">size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">origin</span> <span class="o">=</span> <span class="n">start</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">image</span> <span class="o">=</span> <span class="n">image</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_transformer</span> <span class="o">=</span> <span class="n">transformer</span>
+
+<div class="viewcode-block" id="SmartImage.transform_to_other"><a class="viewcode-back" href="../../../imagesplit.image.image_wrapper.html#imagesplit.image.image_wrapper.SmartImage.transform_to_other">[docs]</a>    <span class="k">def</span> <span class="nf">transform_to_other</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transformer</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns this image transformed to a different local system&quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">image</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Image has not been created&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_transformer</span><span class="o">.</span><span class="n">image_to_other</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">image</span><span class="p">,</span> <span class="n">transformer</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SmartImage.coords_to_other"><a class="viewcode-back" href="../../../imagesplit.image.image_wrapper.html#imagesplit.image.image_wrapper.SmartImage.coords_to_other">[docs]</a>    <span class="k">def</span> <span class="nf">coords_to_other</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transformer</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Converts coordinates to another system&quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_transformer</span><span class="o">.</span><span class="n">to_other</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">origin</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">transformer</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SmartImage.transform_coords"><a class="viewcode-back" href="../../../imagesplit.image.image_wrapper.html#imagesplit.image.image_wrapper.SmartImage.transform_coords">[docs]</a>    <span class="k">def</span> <span class="nf">transform_coords</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sub_image</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">sub_image</span><span class="o">.</span><span class="n">coords_to_other</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_transformer</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SmartImage.transform_sub_image"><a class="viewcode-back" href="../../../imagesplit.image.image_wrapper.html#imagesplit.image.image_wrapper.SmartImage.transform_sub_image">[docs]</a>    <span class="k">def</span> <span class="nf">transform_sub_image</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sub_image</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">sub_image</span><span class="o">.</span><span class="n">transform_to_other</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_transformer</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="ImageStorage"><a class="viewcode-back" href="../../../imagesplit.image.image_wrapper.html#imagesplit.image.image_wrapper.ImageStorage">[docs]</a><span class="k">class</span> <span class="nc">ImageStorage</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Abstraction for storing image data in an arbitrary orientation</span>
+
+<span class="sd">    Allows storing of data without assuming the order in which the dimensions</span>
+<span class="sd">    are stored in memory or indexed. This allows images to be indexed using</span>
+<span class="sd">    the [x,y,z] convention while the numpy ordering is actually [z,y,x]</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">numpy_image</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_numpy_image</span> <span class="o">=</span> <span class="n">numpy_image</span>
+
+<div class="viewcode-block" id="ImageStorage.set"><a class="viewcode-back" href="../../../imagesplit.image.image_wrapper.html#imagesplit.image.image_wrapper.ImageStorage.set">[docs]</a>    <span class="k">def</span> <span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">selector</span><span class="p">,</span> <span class="n">image</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Replaces part of the image data using the specified selectors&quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_numpy_image</span><span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="n">selector</span><span class="p">))]</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">get_raw</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ImageStorage.get"><a class="viewcode-back" href="../../../imagesplit.image.image_wrapper.html#imagesplit.image.image_wrapper.ImageStorage.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">selector</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns part of the image data using the specified selectors&quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="n">ImageStorage</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_numpy_image</span><span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="n">selector</span><span class="p">))])</span></div>
+
+<div class="viewcode-block" id="ImageStorage.get_size"><a class="viewcode-back" href="../../../imagesplit.image.image_wrapper.html#imagesplit.image.image_wrapper.ImageStorage.get_size">[docs]</a>    <span class="k">def</span> <span class="nf">get_size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the image size in the global dimension ordering scheme&quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_numpy_image</span><span class="p">))))</span></div>
+
+<div class="viewcode-block" id="ImageStorage.get_type"><a class="viewcode-back" href="../../../imagesplit.image.image_wrapper.html#imagesplit.image.image_wrapper.ImageStorage.get_type">[docs]</a>    <span class="k">def</span> <span class="nf">get_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the underlying data type&quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_numpy_image</span><span class="o">.</span><span class="n">dtype</span></div>
+
+<div class="viewcode-block" id="ImageStorage.get_raw"><a class="viewcode-back" href="../../../imagesplit.image.image_wrapper.html#imagesplit.image.image_wrapper.ImageStorage.get_raw">[docs]</a>    <span class="k">def</span> <span class="nf">get_raw</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return raw image array; might not be in global dimension ordering&quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_numpy_image</span></div>
+
+<div class="viewcode-block" id="ImageStorage.get_image"><a class="viewcode-back" href="../../../imagesplit.image.image_wrapper.html#imagesplit.image.image_wrapper.ImageStorage.get_image">[docs]</a>    <span class="k">def</span> <span class="nf">get_image</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Creates and returns an Image object for this data&quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="n">Image</span><span class="o">.</span><span class="n">fromarray</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_numpy_image</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="ImageStorage.get_raw_image"><a class="viewcode-back" href="../../../imagesplit.image.image_wrapper.html#imagesplit.image.image_wrapper.ImageStorage.get_raw_image">[docs]</a>    <span class="k">def</span> <span class="nf">get_raw_image</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return raw image array in the standard PIL dimension ordering&quot;&quot;&quot;</span>
+
+        <span class="n">transposed</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_numpy_image</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">ndim</span><span class="p">(</span><span class="n">transposed</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span> <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">transposed</span><span class="p">)[</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">transposed</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">transposed</span></div>
+
+<div class="viewcode-block" id="ImageStorage.transpose"><a class="viewcode-back" href="../../../imagesplit.image.image_wrapper.html#imagesplit.image.image_wrapper.ImageStorage.transpose">[docs]</a>    <span class="k">def</span> <span class="nf">transpose</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">order</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return a transpose of the image data using global ordering&quot;&quot;&quot;</span>
+
+        <span class="n">order</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">order</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">order</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">ImageStorage</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_numpy_image</span><span class="p">,</span>
+                                         <span class="nb">list</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="n">order</span><span class="p">))))</span></div>
+
+<div class="viewcode-block" id="ImageStorage.flip"><a class="viewcode-back" href="../../../imagesplit.image.image_wrapper.html#imagesplit.image.image_wrapper.ImageStorage.flip">[docs]</a>    <span class="k">def</span> <span class="nf">flip</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">do_flip</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return a copy of image data flipped using global ordering&quot;&quot;&quot;</span>
+
+        <span class="n">image</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_numpy_image</span>
+        <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">flip</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">do_flip</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">flip</span><span class="p">:</span>
+                <span class="n">image</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">do_flip</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">index</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ImageStorage</span><span class="p">(</span><span class="n">image</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ImageStorage.reshape"><a class="viewcode-back" href="../../../imagesplit.image.image_wrapper.html#imagesplit.image.image_wrapper.ImageStorage.reshape">[docs]</a>    <span class="k">def</span> <span class="nf">reshape</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_shape</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return a reshaping of the image data using global ordering&quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="n">ImageStorage</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_numpy_image</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="n">new_shape</span><span class="p">))))</span></div>
+
+    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Overrides the default implementation&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array_equal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_numpy_image</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">get_raw</span><span class="p">())</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="k">def</span> <span class="fm">__ne__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Overrides the default implementation&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__eq__</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ImageStorage.copy"><a class="viewcode-back" href="../../../imagesplit.image.image_wrapper.html#imagesplit.image.image_wrapper.ImageStorage.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns a new object with a copy of the underlying data&quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="n">ImageStorage</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_numpy_image</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="ImageStorage.create_empty"><a class="viewcode-back" href="../../../imagesplit.image.image_wrapper.html#imagesplit.image.image_wrapper.ImageStorage.create_empty">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">create_empty</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">dtype</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create empty object of the specified global size and data type&quot;&quot;&quot;</span>
+
+        <span class="n">raw</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="n">size</span><span class="p">)),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">numpy_image</span><span class="o">=</span><span class="n">raw</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ImageStorage.from_raw_image"><a class="viewcode-back" href="../../../imagesplit.image.image_wrapper.html#imagesplit.image.image_wrapper.ImageStorage.from_raw_image">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_raw_image</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">raw</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create ImageStorage object from this image data array&quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">size</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">array_equal</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">raw</span><span class="p">),</span>
+                                       <span class="n">size</span><span class="p">[:</span><span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">raw</span><span class="p">))]):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;When loading an image, nonsingleton dimensions &#39;</span>
+                             <span class="s1">&#39;must match size&#39;</span><span class="p">)</span>
+        <span class="c1"># Add in singleton dimensions if required</span>
+        <span class="k">if</span> <span class="n">size</span><span class="p">:</span>
+            <span class="n">raw</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">raw</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">raw</span><span class="p">))</span></div></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../../index.html">
+              <img class="logo" src="../../../_static/giftsurg-icon.png" alt="Logo"/>
+            </a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">ImageSplit  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">imagesplit.image.image_wrapper</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, UCL.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.5.1.
+    </div>
+  </body>
+</html>

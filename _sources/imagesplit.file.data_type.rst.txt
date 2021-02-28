@@ -1,0 +1,7 @@
+imagesplit.file.data\_type module
+=================================
+
+.. automodule:: imagesplit.file.data_type
+   :members:
+   :undoc-members:
+   :show-inheritance:

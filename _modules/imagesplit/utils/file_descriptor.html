@@ -1,0 +1,513 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>imagesplit.utils.file_descriptor &#8212; ImageSplit  documentation</title>
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/classic.css" type="text/css" />
+    
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">ImageSplit  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">imagesplit.utils.file_descriptor</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for imagesplit.utils.file_descriptor</h1><div class="highlight"><pre>
+<span></span><span class="c1"># coding=utf-8</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Wrapper for sub images that form part of a larger volume</span>
+
+<span class="sd">Author: Tom Doel</span>
+<span class="sd">Copyright UCL 2017</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">imagesplit.file.format_factory</span> <span class="kn">import</span> <span class="n">FormatFactory</span>
+<span class="kn">from</span> <span class="nn">imagesplit.file.metaio_reader</span> <span class="kn">import</span> <span class="n">load_mhd_header</span>
+<span class="kn">from</span> <span class="nn">imagesplit.image.combined_image</span> <span class="kn">import</span> <span class="n">Axis</span>
+<span class="kn">from</span> <span class="nn">imagesplit.utils.json_reader</span> <span class="kn">import</span> <span class="n">write_json</span><span class="p">,</span> <span class="n">read_json</span>
+<span class="kn">from</span> <span class="nn">imagesplit.utils.utilities</span> <span class="kn">import</span> <span class="n">ranges_for_max_block_size</span><span class="p">,</span> \
+    <span class="n">convert_to_array</span>
+
+
+<div class="viewcode-block" id="SubImageRanges"><a class="viewcode-back" href="../../../imagesplit.utils.file_descriptor.html#imagesplit.utils.file_descriptor.SubImageRanges">[docs]</a><span class="k">class</span> <span class="nc">SubImageRanges</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Convert range arrays to image parameters&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ranges</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ranges</span> <span class="o">=</span> <span class="n">ranges</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">origin_start</span> <span class="o">=</span> <span class="p">[</span><span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ranges</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">origin_end</span> <span class="o">=</span> <span class="p">[</span><span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ranges</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">image_size</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span> <span class="o">+</span> <span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ranges</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">roi_start</span> <span class="o">=</span> <span class="p">[</span><span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">r</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ranges</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">roi_end</span> <span class="o">=</span> <span class="p">[</span><span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">r</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ranges</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">roi_size</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span> <span class="o">+</span> <span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">r</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span> <span class="o">-</span> <span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">r</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ranges</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="vm">__dict__</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="k">def</span> <span class="fm">__ne__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__eq__</span><span class="p">(</span><span class="n">other</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="GlobalImageDescriptor"><a class="viewcode-back" href="../../../imagesplit.utils.file_descriptor.html#imagesplit.utils.file_descriptor.GlobalImageDescriptor">[docs]</a><span class="k">class</span> <span class="nc">GlobalImageDescriptor</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Describes a full combined image&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">file_format</span><span class="p">,</span> <span class="n">dim_order_condensed</span><span class="p">,</span> <span class="n">data_type</span><span class="p">,</span> <span class="n">msb</span><span class="p">,</span>
+                 <span class="n">voxel_size</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_type</span> <span class="o">=</span> <span class="n">data_type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_format</span> <span class="o">=</span> <span class="n">file_format</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">size</span> <span class="o">=</span> <span class="n">size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_dims</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">size</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">msb</span> <span class="o">=</span> <span class="n">msb</span>
+        <span class="n">dim_order</span> <span class="o">=</span> <span class="n">dim_order_condensed</span> <span class="k">if</span> <span class="n">dim_order_condensed</span> \
+            <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_dims</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">axis</span> <span class="o">=</span> <span class="n">Axis</span><span class="o">.</span><span class="n">from_condensed_format</span><span class="p">(</span><span class="n">dim_order</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">voxel_size</span> <span class="o">=</span> <span class="n">voxel_size</span>
+
+    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="vm">__dict__</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="k">def</span> <span class="fm">__ne__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__eq__</span><span class="p">(</span><span class="n">other</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SubImageDescriptor"><a class="viewcode-back" href="../../../imagesplit.utils.file_descriptor.html#imagesplit.utils.file_descriptor.SubImageDescriptor">[docs]</a><span class="k">class</span> <span class="nc">SubImageDescriptor</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Describes an image in relation to a larger image&quot;&quot;&quot;</span>
+
+    <span class="c1"># pylint: disable=too-many-instance-attributes</span>
+    <span class="c1"># pylint: disable=too-many-arguments</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">file_format</span><span class="p">,</span> <span class="n">data_type</span><span class="p">,</span>
+                 <span class="n">template</span><span class="p">,</span> <span class="n">ranges</span><span class="p">,</span> <span class="n">dim_order_condensed</span><span class="p">,</span> <span class="n">suffix</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">msb</span><span class="p">,</span>
+                 <span class="n">compression</span><span class="p">,</span> <span class="n">voxel_size</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">suffix</span> <span class="o">=</span> <span class="n">suffix</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">index</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">filename</span> <span class="o">=</span> <span class="n">filename</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_format</span> <span class="o">=</span> <span class="n">file_format</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_type</span> <span class="o">=</span> <span class="n">data_type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">template</span> <span class="o">=</span> <span class="n">template</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ranges</span> <span class="o">=</span> <span class="n">SubImageRanges</span><span class="p">(</span><span class="n">ranges</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">axis</span> <span class="o">=</span> <span class="n">Axis</span><span class="o">.</span><span class="n">from_condensed_format</span><span class="p">(</span><span class="n">dim_order_condensed</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">msb</span> <span class="o">=</span> <span class="n">msb</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">compression</span> <span class="o">=</span> <span class="n">compression</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">voxel_size</span> <span class="o">=</span> <span class="n">voxel_size</span>
+
+<div class="viewcode-block" id="SubImageDescriptor.get_local_size"><a class="viewcode-back" href="../../../imagesplit.utils.file_descriptor.html#imagesplit.utils.file_descriptor.SubImageDescriptor.get_local_size">[docs]</a>    <span class="k">def</span> <span class="nf">get_local_size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Transpose the subimage size to the local coordinate system&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">take</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ranges</span><span class="o">.</span><span class="n">image_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">axis</span><span class="o">.</span><span class="n">dim_order</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="SubImageDescriptor.get_local_origin"><a class="viewcode-back" href="../../../imagesplit.utils.file_descriptor.html#imagesplit.utils.file_descriptor.SubImageDescriptor.get_local_origin">[docs]</a>    <span class="k">def</span> <span class="nf">get_local_origin</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Transpose the subimage origin to the local coordinate system&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">take</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ranges</span><span class="o">.</span><span class="n">origin_start</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">axis</span><span class="o">.</span><span class="n">dim_order</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="SubImageDescriptor.get_local_voxel_size"><a class="viewcode-back" href="../../../imagesplit.utils.file_descriptor.html#imagesplit.utils.file_descriptor.SubImageDescriptor.get_local_voxel_size">[docs]</a>    <span class="k">def</span> <span class="nf">get_local_voxel_size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Transpose the subimage origin to the local coordinate system&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">take</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">voxel_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">axis</span><span class="o">.</span><span class="n">dim_order</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="SubImageDescriptor.from_dict"><a class="viewcode-back" href="../../../imagesplit.utils.file_descriptor.html#imagesplit.utils.file_descriptor.SubImageDescriptor.from_dict">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">from_dict</span><span class="p">(</span><span class="n">descriptor_dict</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create SubImageDescriptor from dictionary entries&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">SubImageDescriptor</span><span class="p">(</span>
+            <span class="n">filename</span><span class="o">=</span><span class="n">descriptor_dict</span><span class="p">[</span><span class="s2">&quot;filename&quot;</span><span class="p">],</span>
+            <span class="n">file_format</span><span class="o">=</span><span class="n">descriptor_dict</span><span class="p">[</span><span class="s2">&quot;file_format&quot;</span><span class="p">],</span>
+            <span class="n">data_type</span><span class="o">=</span><span class="n">descriptor_dict</span><span class="p">[</span><span class="s2">&quot;data_type&quot;</span><span class="p">],</span>
+            <span class="n">template</span><span class="o">=</span><span class="n">descriptor_dict</span><span class="p">[</span><span class="s2">&quot;template&quot;</span><span class="p">],</span>
+            <span class="n">ranges</span><span class="o">=</span><span class="n">descriptor_dict</span><span class="p">[</span><span class="s2">&quot;ranges&quot;</span><span class="p">],</span>
+            <span class="n">dim_order_condensed</span><span class="o">=</span><span class="n">descriptor_dict</span><span class="p">[</span><span class="s2">&quot;dim_order&quot;</span><span class="p">],</span>
+            <span class="n">suffix</span><span class="o">=</span><span class="n">descriptor_dict</span><span class="p">[</span><span class="s2">&quot;suffix&quot;</span><span class="p">],</span>
+            <span class="n">index</span><span class="o">=</span><span class="n">descriptor_dict</span><span class="p">[</span><span class="s2">&quot;index&quot;</span><span class="p">],</span>
+            <span class="n">msb</span><span class="o">=</span><span class="n">descriptor_dict</span><span class="p">[</span><span class="s2">&quot;msb&quot;</span><span class="p">],</span>
+            <span class="n">compression</span><span class="o">=</span><span class="n">descriptor_dict</span><span class="p">[</span><span class="s2">&quot;compression&quot;</span><span class="p">],</span>
+            <span class="n">voxel_size</span><span class="o">=</span><span class="n">descriptor_dict</span><span class="p">[</span><span class="s2">&quot;voxel_size&quot;</span><span class="p">],</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="SubImageDescriptor.to_dict"><a class="viewcode-back" href="../../../imagesplit.utils.file_descriptor.html#imagesplit.utils.file_descriptor.SubImageDescriptor.to_dict">[docs]</a>    <span class="k">def</span> <span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get a dictionary for the metadata for this subimage&quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;index&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">,</span>
+                <span class="s2">&quot;suffix&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">suffix</span><span class="p">,</span>
+                <span class="s2">&quot;filename&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">,</span>
+                <span class="s2">&quot;data_type&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_type</span><span class="p">,</span>
+                <span class="s2">&quot;file_format&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_format</span><span class="p">,</span>
+                <span class="s2">&quot;template&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">template</span><span class="p">,</span>
+                <span class="s2">&quot;dim_order&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">axis</span><span class="o">.</span><span class="n">to_condensed_format</span><span class="p">(),</span>
+                <span class="s2">&quot;compression&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">compression</span><span class="p">,</span>
+                <span class="s2">&quot;msb&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">msb</span><span class="p">,</span>
+                <span class="s2">&quot;voxel_size&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">voxel_size</span><span class="p">,</span>
+                <span class="s2">&quot;ranges&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">ranges</span><span class="o">.</span><span class="n">ranges</span><span class="p">}</span></div>
+
+    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="vm">__dict__</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="k">def</span> <span class="fm">__ne__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__eq__</span><span class="p">(</span><span class="n">other</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="write_descriptor_file"><a class="viewcode-back" href="../../../imagesplit.utils.file_descriptor.html#imagesplit.utils.file_descriptor.write_descriptor_file">[docs]</a><span class="k">def</span> <span class="nf">write_descriptor_file</span><span class="p">(</span><span class="n">descriptors_in</span><span class="p">,</span> <span class="n">descriptors_out</span><span class="p">,</span> <span class="n">filename_out_base</span><span class="p">,</span>
+                          <span class="n">test</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Saves descriptor files&quot;&quot;&quot;</span>
+    <span class="n">dict_in</span> <span class="o">=</span> <span class="n">convert_to_dict</span><span class="p">(</span><span class="n">descriptors_in</span><span class="p">)</span>
+    <span class="n">dict_out</span> <span class="o">=</span> <span class="n">convert_to_dict</span><span class="p">(</span><span class="n">descriptors_out</span><span class="p">)</span>
+    <span class="n">descriptor</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;appname&quot;</span><span class="p">:</span> <span class="s2">&quot;ImageSplit data&quot;</span><span class="p">,</span> <span class="s2">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;1.0&quot;</span><span class="p">,</span>
+                  <span class="s2">&quot;split_files&quot;</span><span class="p">:</span> <span class="n">dict_out</span><span class="p">,</span>
+                  <span class="s2">&quot;source_files&quot;</span><span class="p">:</span> <span class="n">dict_in</span><span class="p">}</span>
+    <span class="n">descriptor_output_filename</span> <span class="o">=</span> <span class="n">filename_out_base</span> <span class="o">+</span> <span class="s2">&quot;_info.imagesplit&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">test</span><span class="p">:</span>
+        <span class="n">write_json</span><span class="p">(</span><span class="n">descriptor_output_filename</span><span class="p">,</span> <span class="n">descriptor</span><span class="p">)</span></div>
+
+
+<span class="c1"># pylint: disable=too-many-arguments</span>
+<div class="viewcode-block" id="generate_output_descriptors"><a class="viewcode-back" href="../../../imagesplit.utils.file_descriptor.html#imagesplit.utils.file_descriptor.generate_output_descriptors">[docs]</a><span class="k">def</span> <span class="nf">generate_output_descriptors</span><span class="p">(</span><span class="n">filename_out_base</span><span class="p">,</span>
+                                <span class="n">max_block_size_voxels</span><span class="p">,</span>
+                                <span class="n">overlap_size_voxels</span><span class="p">,</span>
+                                <span class="n">dim_order</span><span class="p">,</span>
+                                <span class="n">header</span><span class="p">,</span>
+                                <span class="n">output_type</span><span class="p">,</span>
+                                <span class="n">num_dims</span><span class="p">,</span>
+                                <span class="n">output_file_format</span><span class="p">,</span>
+                                <span class="n">image_size</span><span class="p">,</span>
+                                <span class="n">msb</span><span class="p">,</span>
+                                <span class="n">compression</span><span class="p">,</span>
+                                <span class="n">voxel_size</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Creates descriptors representing file output&quot;&quot;&quot;</span>
+    <span class="n">max_block_size_voxels_array</span> <span class="o">=</span> <span class="n">convert_to_array</span><span class="p">(</span><span class="n">max_block_size_voxels</span><span class="p">,</span>
+                                                   <span class="s2">&quot;block size&quot;</span><span class="p">,</span> <span class="n">num_dims</span><span class="p">)</span>
+    <span class="n">overlap_voxels_size_array</span> <span class="o">=</span> <span class="n">convert_to_array</span><span class="p">(</span><span class="n">overlap_size_voxels</span><span class="p">,</span>
+                                                 <span class="s2">&quot;overlap size&quot;</span><span class="p">,</span> <span class="n">num_dims</span><span class="p">)</span>
+    <span class="n">ranges</span> <span class="o">=</span> <span class="n">ranges_for_max_block_size</span><span class="p">(</span><span class="n">image_size</span><span class="p">,</span> <span class="n">max_block_size_voxels_array</span><span class="p">,</span>
+                                       <span class="n">overlap_voxels_size_array</span><span class="p">)</span>
+
+    <span class="n">extension</span> <span class="o">=</span> <span class="n">FormatFactory</span><span class="o">.</span><span class="n">get_extension_for_format</span><span class="p">(</span><span class="n">output_file_format</span><span class="p">)</span>
+    <span class="n">descriptors_out</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">index</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">subimage_range</span> <span class="ow">in</span> <span class="n">ranges</span><span class="p">:</span>
+        <span class="n">suffix</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ranges</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">1</span> <span class="k">else</span> \
+            <span class="s2">&quot;_&quot;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="si">{0:04d}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+        <span class="n">output_filename_header</span> <span class="o">=</span> <span class="n">filename_out_base</span> <span class="o">+</span> <span class="n">suffix</span> <span class="o">+</span> <span class="n">extension</span>
+        <span class="n">file_descriptor_out</span> <span class="o">=</span> <span class="n">SubImageDescriptor</span><span class="p">(</span>
+            <span class="n">filename</span><span class="o">=</span><span class="n">output_filename_header</span><span class="p">,</span>
+            <span class="n">file_format</span><span class="o">=</span><span class="n">output_file_format</span><span class="p">,</span>
+            <span class="n">ranges</span><span class="o">=</span><span class="n">subimage_range</span><span class="p">,</span>
+            <span class="n">suffix</span><span class="o">=</span><span class="n">suffix</span><span class="p">,</span>
+            <span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">,</span>
+            <span class="n">dim_order_condensed</span><span class="o">=</span><span class="n">dim_order</span><span class="p">,</span>
+            <span class="n">data_type</span><span class="o">=</span><span class="n">output_type</span><span class="p">,</span>
+            <span class="n">template</span><span class="o">=</span><span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">header</span><span class="p">),</span>
+            <span class="n">msb</span><span class="o">=</span><span class="n">msb</span><span class="p">,</span>
+            <span class="n">compression</span><span class="o">=</span><span class="n">compression</span><span class="p">,</span>
+            <span class="n">voxel_size</span><span class="o">=</span><span class="n">voxel_size</span>
+        <span class="p">)</span>
+        <span class="n">descriptors_out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">file_descriptor_out</span><span class="p">)</span>
+        <span class="n">index</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">descriptors_out</span></div>
+
+
+<div class="viewcode-block" id="load_descriptor"><a class="viewcode-back" href="../../../imagesplit.utils.file_descriptor.html#imagesplit.utils.file_descriptor.load_descriptor">[docs]</a><span class="k">def</span> <span class="nf">load_descriptor</span><span class="p">(</span><span class="n">descriptor_filename</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Loads and parses a file descriptor from disk&quot;&quot;&quot;</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">read_json</span><span class="p">(</span><span class="n">descriptor_filename</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;appname&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;ImageSplit data&quot;</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Not an ImageSplit file&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;version&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;1.0&quot;</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Cannot read this file version&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">data</span></div>
+
+
+<div class="viewcode-block" id="header_from_descriptor"><a class="viewcode-back" href="../../../imagesplit.utils.file_descriptor.html#imagesplit.utils.file_descriptor.header_from_descriptor">[docs]</a><span class="k">def</span> <span class="nf">header_from_descriptor</span><span class="p">(</span><span class="n">descriptor_filename</span><span class="p">,</span> <span class="n">filename_override</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Create a file header based on descriptor information&quot;&quot;&quot;</span>
+    <span class="n">descriptor</span> <span class="o">=</span> <span class="n">load_descriptor</span><span class="p">(</span><span class="n">descriptor_filename</span><span class="p">)</span>
+    <span class="n">original_file_list</span> <span class="o">=</span> <span class="n">descriptor</span><span class="p">[</span><span class="s2">&quot;source_files&quot;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">original_file_list</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s1">&#39;This function only supports data derived from a single file&#39;</span><span class="p">)</span>
+    <span class="n">original_file_descriptor</span> <span class="o">=</span> <span class="n">original_file_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">file_format</span> <span class="o">=</span> <span class="n">FormatFactory</span><span class="o">.</span><span class="n">simplify_format</span><span class="p">(</span>
+        <span class="n">original_file_descriptor</span><span class="p">[</span><span class="s2">&quot;file_format&quot;</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">file_format</span> <span class="o">==</span> <span class="s2">&quot;mhd&quot;</span><span class="p">:</span>
+        <span class="n">original_header</span> <span class="o">=</span> <span class="n">load_mhd_header</span><span class="p">(</span><span class="n">original_file_descriptor</span><span class="p">[</span><span class="s2">&quot;filename&quot;</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">original_header</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># ToDo</span>
+    <span class="n">input_file_list</span> <span class="o">=</span> <span class="n">descriptor</span><span class="p">[</span><span class="s2">&quot;split_files&quot;</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">filename_override</span><span class="p">:</span>
+        <span class="n">input_file_base</span><span class="p">,</span> <span class="n">extension</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">filename_override</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">input_file</span> <span class="ow">in</span> <span class="n">input_file_list</span><span class="p">:</span>
+            <span class="c1"># old_filename = input_file[&quot;filename&quot;]</span>
+            <span class="n">filename</span> <span class="o">=</span> <span class="n">input_file_base</span> <span class="o">+</span> <span class="n">input_file</span><span class="p">[</span><span class="s2">&quot;suffix&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">extension</span>
+            <span class="n">input_file</span><span class="p">[</span><span class="s2">&quot;filename&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">filename</span>
+
+    <span class="n">descriptors</span> <span class="o">=</span> <span class="n">convert_to_descriptors</span><span class="p">(</span><span class="n">input_file_list</span><span class="p">)</span>
+
+    <span class="n">global_descriptor</span> <span class="o">=</span> <span class="n">_aggregate_global_descriptor</span><span class="p">(</span><span class="n">descriptors</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">original_header</span><span class="p">,</span> <span class="n">descriptors</span><span class="p">,</span> <span class="n">global_descriptor</span></div>
+
+
+<div class="viewcode-block" id="generate_input_descriptors"><a class="viewcode-back" href="../../../imagesplit.utils.file_descriptor.html#imagesplit.utils.file_descriptor.generate_input_descriptors">[docs]</a><span class="k">def</span> <span class="nf">generate_input_descriptors</span><span class="p">(</span><span class="n">input_file</span><span class="p">,</span> <span class="n">start_index</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Create descriptors for one or more input files that do not have a</span>
+<span class="sd">    descriptor file&quot;&quot;&quot;</span>
+
+    <span class="n">format_factory</span> <span class="o">=</span> <span class="n">FormatFactory</span><span class="p">()</span>
+    <span class="n">input_file_base</span><span class="p">,</span> <span class="n">extension</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">input_file</span><span class="p">)</span>
+    <span class="n">descriptors</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">current_ranges</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">combined_header</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">full_image_size</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">if</span> <span class="n">start_index</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># If no start index is specified, load a single header file</span>
+        <span class="n">file_index</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">format_str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># Load a series of files starting with the specified prefix</span>
+        <span class="n">file_index</span> <span class="o">=</span> <span class="n">start_index</span>
+        <span class="n">format_str</span> <span class="o">=</span> <span class="n">_get_format_string</span><span class="p">(</span><span class="n">extension</span><span class="p">,</span> <span class="n">input_file_base</span><span class="p">,</span> <span class="n">start_index</span><span class="p">)</span>
+
+    <span class="n">suffix</span> <span class="o">=</span> <span class="n">format_str</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">start_index</span><span class="p">)</span>
+    <span class="n">header_filename</span> <span class="o">=</span> <span class="n">input_file_base</span> <span class="o">+</span> <span class="n">suffix</span> <span class="o">+</span> <span class="n">extension</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">header_filename</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s1">&#39;No file series found starting with &#39;</span> <span class="o">+</span> <span class="n">header_filename</span><span class="p">)</span>
+
+    <span class="c1"># Loop through all the input files</span>
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="n">file_descriptor</span><span class="p">,</span> <span class="n">current_header</span> <span class="o">=</span> <span class="n">parse_header</span><span class="p">(</span><span class="n">header_filename</span><span class="p">,</span>
+                                                       <span class="n">format_factory</span><span class="p">)</span>
+        <span class="n">data_type</span> <span class="o">=</span> <span class="n">file_descriptor</span><span class="o">.</span><span class="n">data_type</span>
+        <span class="n">dim_order</span> <span class="o">=</span> <span class="n">file_descriptor</span><span class="o">.</span><span class="n">dim_order</span>
+        <span class="n">file_format</span> <span class="o">=</span> <span class="n">file_descriptor</span><span class="o">.</span><span class="n">file_format</span>
+        <span class="n">current_image_size</span> <span class="o">=</span> <span class="n">file_descriptor</span><span class="o">.</span><span class="n">image_size</span>
+        <span class="n">voxel_size</span> <span class="o">=</span> <span class="n">file_descriptor</span><span class="o">.</span><span class="n">voxel_size</span>
+        <span class="n">msb</span> <span class="o">=</span> <span class="n">file_descriptor</span><span class="o">.</span><span class="n">msb</span>
+        <span class="n">compression</span> <span class="o">=</span> <span class="n">file_descriptor</span><span class="o">.</span><span class="n">compression</span>
+
+        <span class="c1"># Reorder image size and voxel size dimensions</span>
+        <span class="n">axis</span> <span class="o">=</span> <span class="n">Axis</span><span class="o">.</span><span class="n">from_condensed_format</span><span class="p">(</span><span class="n">dim_order</span><span class="p">)</span>
+        <span class="n">current_image_size</span> <span class="o">=</span> \
+            <span class="n">np</span><span class="o">.</span><span class="n">take</span><span class="p">(</span><span class="n">current_image_size</span><span class="p">,</span> <span class="n">axis</span><span class="o">.</span><span class="n">reverse_dim_order</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+        <span class="n">voxel_size</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">take</span><span class="p">(</span><span class="n">voxel_size</span><span class="p">,</span> <span class="n">axis</span><span class="o">.</span><span class="n">reverse_dim_order</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">current_ranges</span><span class="p">:</span>
+            <span class="n">full_image_size</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">current_image_size</span><span class="p">)</span>
+            <span class="n">combined_header</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">current_header</span><span class="p">)</span>
+            <span class="n">current_ranges</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="n">current_image_size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+                              <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">current_image_size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+                              <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">current_image_size</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># For multiple input files, concatenate volumes</span>
+            <span class="k">if</span> <span class="n">current_image_size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">full_image_size</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s1">&#39;When loading without a descriptor file, the first &#39;</span>
+                    <span class="s1">&#39;dimension of each file must &#39;</span>
+                    <span class="s1">&#39;match&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">current_image_size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="n">full_image_size</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s1">&#39;When loading without a descriptor file, the second &#39;</span>
+                    <span class="s1">&#39;dimension of each file must &#39;</span>
+                    <span class="s1">&#39;match&#39;</span><span class="p">)</span>
+            <span class="n">full_image_size</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">full_image_size</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="n">current_image_size</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+            <span class="n">current_ranges</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">current_ranges</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="n">current_ranges</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">current_ranges</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> \
+                <span class="n">current_image_size</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+
+        <span class="c1"># Create a descriptor for this subimage</span>
+        <span class="n">ranges_to_write</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">current_ranges</span><span class="p">)</span>
+        <span class="n">descriptors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">SubImageDescriptor</span><span class="p">(</span>
+            <span class="n">index</span><span class="o">=</span><span class="n">file_index</span><span class="p">,</span>
+            <span class="n">suffix</span><span class="o">=</span><span class="n">suffix</span><span class="p">,</span>
+            <span class="n">filename</span><span class="o">=</span><span class="n">header_filename</span><span class="p">,</span>
+            <span class="n">ranges</span><span class="o">=</span><span class="n">ranges_to_write</span><span class="p">,</span>
+            <span class="n">template</span><span class="o">=</span><span class="n">combined_header</span><span class="p">,</span>
+            <span class="n">data_type</span><span class="o">=</span><span class="n">data_type</span><span class="p">,</span>
+            <span class="n">dim_order_condensed</span><span class="o">=</span><span class="n">dim_order</span><span class="p">,</span>
+            <span class="n">file_format</span><span class="o">=</span><span class="n">file_format</span><span class="p">,</span>
+            <span class="n">msb</span><span class="o">=</span><span class="n">msb</span><span class="p">,</span>
+            <span class="n">compression</span><span class="o">=</span><span class="n">compression</span><span class="p">,</span>
+            <span class="n">voxel_size</span><span class="o">=</span><span class="n">voxel_size</span>
+        <span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">start_index</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># Single file already loaded, so terminate the while True loop</span>
+            <span class="k">break</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Search for next file, and if not found terminate the loop</span>
+            <span class="n">file_index</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">suffix</span> <span class="o">=</span> <span class="n">format_str</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">file_index</span><span class="p">)</span>
+            <span class="n">header_filename</span> <span class="o">=</span> <span class="n">input_file_base</span> <span class="o">+</span> <span class="n">suffix</span> <span class="o">+</span> <span class="n">extension</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">header_filename</span><span class="p">):</span>
+                <span class="k">break</span>
+
+    <span class="n">full_image_size</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">full_image_size</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+
+    <span class="n">global_descriptor</span> <span class="o">=</span> <span class="n">_aggregate_global_descriptor</span><span class="p">(</span><span class="n">descriptors</span><span class="p">)</span>
+
+    <span class="c1"># Update the combined image size</span>
+    <span class="n">combined_header</span><span class="p">[</span><span class="s2">&quot;DimSize&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">full_image_size</span>
+
+    <span class="c1"># Update voxel size</span>
+    <span class="n">combined_header</span><span class="p">[</span><span class="s2">&quot;ElementSize&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">voxel_size</span>
+
+    <span class="k">return</span> <span class="n">combined_header</span><span class="p">,</span> <span class="n">descriptors</span><span class="p">,</span> <span class="n">global_descriptor</span></div>
+
+
+<span class="k">def</span> <span class="nf">_aggregate_global_descriptor</span><span class="p">(</span><span class="n">descriptors</span><span class="p">):</span>
+    <span class="n">global_ranges</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">combined_dim_order</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">combined_file_format</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">data_type</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">msb</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">voxel_size</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">for</span> <span class="n">descriptor</span> <span class="ow">in</span> <span class="n">descriptors</span><span class="p">:</span>
+        <span class="n">current_ranges</span> <span class="o">=</span> <span class="n">descriptor</span><span class="o">.</span><span class="n">ranges</span><span class="o">.</span><span class="n">ranges</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">global_ranges</span><span class="p">:</span>
+            <span class="n">global_ranges</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">current_ranges</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">global_ranges</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">global_ranges</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">current_ranges</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">global_ranges</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">global_ranges</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> <span class="n">current_ranges</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">global_ranges</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">global_ranges</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">current_ranges</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">global_ranges</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">global_ranges</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> <span class="n">current_ranges</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">global_ranges</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">global_ranges</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">current_ranges</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">global_ranges</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">global_ranges</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> <span class="n">current_ranges</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">combined_file_format</span><span class="p">:</span>
+            <span class="n">combined_file_format</span> <span class="o">=</span> <span class="n">descriptor</span><span class="o">.</span><span class="n">file_format</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">combined_dim_order</span><span class="p">:</span>
+            <span class="n">combined_dim_order</span> <span class="o">=</span> <span class="n">descriptor</span><span class="o">.</span><span class="n">axis</span><span class="o">.</span><span class="n">to_condensed_format</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">data_type</span><span class="p">:</span>
+            <span class="n">data_type</span> <span class="o">=</span> <span class="n">descriptor</span><span class="o">.</span><span class="n">data_type</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">msb</span><span class="p">:</span>
+            <span class="n">msb</span> <span class="o">=</span> <span class="n">descriptor</span><span class="o">.</span><span class="n">msb</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">voxel_size</span><span class="p">:</span>
+            <span class="n">voxel_size</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">descriptor</span><span class="o">.</span><span class="n">voxel_size</span><span class="p">)</span>
+
+    <span class="n">full_image_size</span> <span class="o">=</span> <span class="p">[</span><span class="n">global_ranges</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">global_ranges</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
+                       <span class="n">global_ranges</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">global_ranges</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
+                       <span class="n">global_ranges</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">global_ranges</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="n">full_image_size</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">full_image_size</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+
+    <span class="n">global_descriptor</span> <span class="o">=</span> <span class="n">GlobalImageDescriptor</span><span class="p">(</span>
+        <span class="n">size</span><span class="o">=</span><span class="n">full_image_size</span><span class="p">,</span>
+        <span class="n">file_format</span><span class="o">=</span><span class="n">combined_file_format</span><span class="p">,</span>
+        <span class="n">dim_order_condensed</span><span class="o">=</span><span class="n">combined_dim_order</span><span class="p">,</span>
+        <span class="n">data_type</span><span class="o">=</span><span class="n">data_type</span><span class="p">,</span>
+        <span class="n">msb</span><span class="o">=</span><span class="n">msb</span><span class="p">,</span>
+        <span class="n">voxel_size</span><span class="o">=</span><span class="n">voxel_size</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">global_descriptor</span>
+
+
+<div class="viewcode-block" id="convert_to_descriptors"><a class="viewcode-back" href="../../../imagesplit.utils.file_descriptor.html#imagesplit.utils.file_descriptor.convert_to_descriptors">[docs]</a><span class="k">def</span> <span class="nf">convert_to_descriptors</span><span class="p">(</span><span class="n">descriptors_dict</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Convert descriptor dictionary to list of SubImageDescriptor objects&quot;&quot;&quot;</span>
+    <span class="n">descriptors_sorted</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">descriptors_dict</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">k</span><span class="p">:</span> <span class="n">k</span><span class="p">[</span><span class="s1">&#39;index&#39;</span><span class="p">])</span>
+    <span class="n">desc</span> <span class="o">=</span> <span class="p">[</span><span class="n">SubImageDescriptor</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">d</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">descriptors_sorted</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">desc</span></div>
+
+
+<div class="viewcode-block" id="convert_to_dict"><a class="viewcode-back" href="../../../imagesplit.utils.file_descriptor.html#imagesplit.utils.file_descriptor.convert_to_dict">[docs]</a><span class="k">def</span> <span class="nf">convert_to_dict</span><span class="p">(</span><span class="n">descriptors</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Convert SubImageDescriptor objects to descriptor dictionary&quot;&quot;&quot;</span>
+
+    <span class="k">return</span> <span class="p">[</span><span class="n">d</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">descriptors</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="parse_header"><a class="viewcode-back" href="../../../imagesplit.utils.file_descriptor.html#imagesplit.utils.file_descriptor.parse_header">[docs]</a><span class="k">def</span> <span class="nf">parse_header</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">factory</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Read metadata from any supported header type&quot;&quot;&quot;</span>
+
+    <span class="c1"># pylint: disable=unused-variable</span>
+    <span class="n">header_base</span><span class="p">,</span> <span class="n">extension</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+
+    <span class="n">format_string</span> <span class="o">=</span> <span class="n">factory</span><span class="o">.</span><span class="n">extension_to_format</span><span class="p">(</span><span class="n">extension</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">factory</span><span class="o">.</span><span class="n">get_factory</span><span class="p">(</span><span class="n">format_string</span><span class="p">)</span><span class="o">.</span><span class="n">load_and_parse_header</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span></div>
+
+
+<span class="k">def</span> <span class="nf">_get_format_string</span><span class="p">(</span><span class="n">extension</span><span class="p">,</span> <span class="n">input_file_base</span><span class="p">,</span> <span class="n">start_index</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">num_zeros</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+        <span class="n">format_str</span> <span class="o">=</span> <span class="s1">&#39;{0:0&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">num_zeros</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;d}&#39;</span>
+        <span class="n">suffix_test</span> <span class="o">=</span> <span class="n">format_str</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">start_index</span><span class="p">)</span>
+        <span class="n">header_filename</span> <span class="o">=</span> <span class="n">input_file_base</span> <span class="o">+</span> <span class="n">suffix_test</span> <span class="o">+</span> <span class="n">extension</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">header_filename</span><span class="p">):</span>
+            <span class="k">break</span>
+    <span class="k">return</span> <span class="n">format_str</span>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../../index.html">
+              <img class="logo" src="../../../_static/giftsurg-icon.png" alt="Logo"/>
+            </a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">ImageSplit  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">imagesplit.utils.file_descriptor</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, UCL.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.5.1.
+    </div>
+  </body>
+</html>

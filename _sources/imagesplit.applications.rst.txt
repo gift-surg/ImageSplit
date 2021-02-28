@@ -1,0 +1,19 @@
+imagesplit.applications package
+===============================
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 4
+
+   imagesplit.applications.split_files
+   imagesplit.applications.write_files
+
+Module contents
+---------------
+
+.. automodule:: imagesplit.applications
+   :members:
+   :undoc-members:
+   :show-inheritance:

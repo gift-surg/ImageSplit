@@ -1,0 +1,437 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>imagesplit.image.combined_image &#8212; ImageSplit  documentation</title>
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/classic.css" type="text/css" />
+    
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">ImageSplit  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">imagesplit.image.combined_image</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for imagesplit.image.combined_image</h1><div class="highlight"><pre>
+<span></span><span class="c1"># coding=utf-8</span>
+
+<span class="sd">&quot;&quot;&quot;Classes for aggregating images from multiple files into a single image&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABCMeta</span><span class="p">,</span> <span class="n">abstractmethod</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">six</span>
+<span class="kn">from</span> <span class="nn">imagesplit.image.image_wrapper</span> <span class="kn">import</span> <span class="n">SmartImage</span>
+
+
+<div class="viewcode-block" id="Source"><a class="viewcode-back" href="../../../imagesplit.image.combined_image.html#imagesplit.image.combined_image.Source">[docs]</a><span class="k">class</span> <span class="nc">Source</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Base class for reading data&quot;&quot;&quot;</span>
+    <span class="n">__metaclass__</span> <span class="o">=</span> <span class="n">ABCMeta</span>
+
+<div class="viewcode-block" id="Source.read_image"><a class="viewcode-back" href="../../../imagesplit.image.combined_image.html#imagesplit.image.combined_image.Source.read_image">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">read_image</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">size</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Read image from specified starting coordinates and size&quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
+
+<div class="viewcode-block" id="Source.close"><a class="viewcode-back" href="../../../imagesplit.image.combined_image.html#imagesplit.image.combined_image.Source.close">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Read image from specified starting coordinates and size&quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div></div>
+
+
+<div class="viewcode-block" id="CombinedImage"><a class="viewcode-back" href="../../../imagesplit.image.combined_image.html#imagesplit.image.combined_image.CombinedImage">[docs]</a><span class="k">class</span> <span class="nc">CombinedImage</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A kind of virtual file for writing where the data are distributed</span>
+<span class="sd">        across multiple real files. &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">descriptors</span><span class="p">,</span> <span class="n">file_factory</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create for the given set of descriptors&quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">limits</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_subimages</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">subimage_descriptor</span> <span class="ow">in</span> <span class="n">descriptors</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_subimages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">SubImage</span><span class="p">(</span><span class="n">subimage_descriptor</span><span class="p">,</span> <span class="n">file_factory</span><span class="p">))</span>
+
+<div class="viewcode-block" id="CombinedImage.read_image"><a class="viewcode-back" href="../../../imagesplit.image.combined_image.html#imagesplit.image.combined_image.CombinedImage.read_image">[docs]</a>    <span class="k">def</span> <span class="nf">read_image</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start_local</span><span class="p">,</span> <span class="n">size_local</span><span class="p">,</span> <span class="n">transformer</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Assembles an image range from subimages&quot;&quot;&quot;</span>
+
+        <span class="c1"># Create the output image wrapper</span>
+        <span class="n">combined_image</span> <span class="o">=</span> <span class="n">SmartImage</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="n">start_local</span><span class="p">,</span>
+                                    <span class="n">size</span><span class="o">=</span><span class="n">size_local</span><span class="p">,</span>
+                                    <span class="n">image</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                    <span class="n">transformer</span><span class="o">=</span><span class="n">transformer</span><span class="p">)</span>
+
+        <span class="c1"># Compute global coordinates to match with subimage descriptors</span>
+        <span class="n">start</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="n">transformer</span><span class="o">.</span><span class="n">to_global</span><span class="p">(</span><span class="n">start_local</span><span class="p">,</span> <span class="n">size_local</span><span class="p">)</span>
+
+        <span class="c1"># Check each subimage for overlaps</span>
+        <span class="k">for</span> <span class="n">subimage</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_subimages</span><span class="p">:</span>
+
+            <span class="c1"># Fetch any part of the image which overlaps this subimage&#39;s ROI</span>
+            <span class="n">part_image</span> <span class="o">=</span> <span class="n">subimage</span><span class="o">.</span><span class="n">read_image_bound_by_roi</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span>
+
+            <span class="c1"># If any part overlapped, copy this into the combined image</span>
+            <span class="k">if</span> <span class="n">part_image</span><span class="p">:</span>
+                <span class="n">combined_image</span><span class="o">.</span><span class="n">set_sub_image</span><span class="p">(</span><span class="n">part_image</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">combined_image</span></div>
+
+<div class="viewcode-block" id="CombinedImage.close"><a class="viewcode-back" href="../../../imagesplit.image.combined_image.html#imagesplit.image.combined_image.CombinedImage.close">[docs]</a>    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Closes all streams and files&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">subimage</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_subimages</span><span class="p">:</span>
+            <span class="n">subimage</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="CombinedImage.write_image"><a class="viewcode-back" href="../../../imagesplit.image.combined_image.html#imagesplit.image.combined_image.CombinedImage.write_image">[docs]</a>    <span class="k">def</span> <span class="nf">write_image</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">rescale</span><span class="p">,</span> <span class="n">test</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Write out all the subimages with data from supplied source&quot;&quot;&quot;</span>
+
+        <span class="c1"># If rescaling is required, get the global limits</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">rescale</span><span class="p">:</span>
+            <span class="n">limits</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">six</span><span class="o">.</span><span class="n">print_</span><span class="p">(</span><span class="s2">&quot;Limits: No rescale&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">rescale</span> <span class="o">==</span> <span class="s2">&quot;limits&quot;</span><span class="p">:</span>
+            <span class="n">limits</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">get_limits</span><span class="p">()</span>
+            <span class="n">six</span><span class="o">.</span><span class="n">print_</span><span class="p">(</span><span class="s2">&quot;Limits: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">limits</span><span class="o">.</span><span class="n">min</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;:&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">limits</span><span class="o">.</span><span class="n">max</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">limits</span> <span class="o">=</span> <span class="n">Limits</span><span class="p">(</span><span class="n">rescale</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">rescale</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">six</span><span class="o">.</span><span class="n">print_</span><span class="p">(</span><span class="s2">&quot;Limits: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">limits</span><span class="o">.</span><span class="n">min</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;:&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">limits</span><span class="o">.</span><span class="n">max</span><span class="p">))</span>
+
+        <span class="c1"># Get each subimage to write itself</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">test</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">next_image</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_subimages</span><span class="p">:</span>
+                <span class="n">next_image</span><span class="o">.</span><span class="n">write_image</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">limits</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CombinedImage.get_limits"><a class="viewcode-back" href="../../../imagesplit.image.combined_image.html#imagesplit.image.combined_image.CombinedImage.get_limits">[docs]</a>    <span class="k">def</span> <span class="nf">get_limits</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return minimum and maximum values across all subimages&quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">limits</span><span class="p">:</span>
+            <span class="n">minv</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">maxv</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">for</span> <span class="n">next_image</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_subimages</span><span class="p">:</span>
+                <span class="n">next_min</span><span class="p">,</span> <span class="n">next_max</span> <span class="o">=</span> <span class="n">next_image</span><span class="o">.</span><span class="n">get_limits</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">minv</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">next_min</span> <span class="o">&lt;</span> <span class="n">minv</span><span class="p">:</span>
+                    <span class="n">minv</span> <span class="o">=</span> <span class="n">next_min</span>
+                <span class="k">if</span> <span class="n">maxv</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">next_max</span> <span class="o">&gt;</span> <span class="n">maxv</span><span class="p">:</span>
+                    <span class="n">maxv</span> <span class="o">=</span> <span class="n">next_max</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">limits</span> <span class="o">=</span> <span class="n">Limits</span><span class="p">(</span><span class="n">minv</span><span class="p">,</span> <span class="n">maxv</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">limits</span></div></div>
+
+
+<div class="viewcode-block" id="Limits"><a class="viewcode-back" href="../../../imagesplit.image.combined_image.html#imagesplit.image.combined_image.Limits">[docs]</a><span class="k">class</span> <span class="nc">Limits</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Image range values across all subimages&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rmin</span><span class="p">,</span> <span class="n">rmax</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">min</span> <span class="o">=</span> <span class="n">rmin</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max</span> <span class="o">=</span> <span class="n">rmax</span></div>
+
+
+<div class="viewcode-block" id="SubImage"><a class="viewcode-back" href="../../../imagesplit.image.combined_image.html#imagesplit.image.combined_image.SubImage">[docs]</a><span class="k">class</span> <span class="nc">SubImage</span><span class="p">(</span><span class="n">Source</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;An image which forms part of a larger image&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">descriptor</span><span class="p">,</span> <span class="n">file_factory</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_file_factory</span> <span class="o">=</span> <span class="n">file_factory</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_descriptor</span> <span class="o">=</span> <span class="n">descriptor</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_read_file</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_roi_start</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_descriptor</span><span class="o">.</span><span class="n">ranges</span><span class="o">.</span><span class="n">roi_start</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_roi_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_descriptor</span><span class="o">.</span><span class="n">ranges</span><span class="o">.</span><span class="n">roi_size</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_axis</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_descriptor</span><span class="o">.</span><span class="n">axis</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_transformer</span> <span class="o">=</span> <span class="n">CoordinateTransformer</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_descriptor</span><span class="o">.</span><span class="n">ranges</span><span class="o">.</span><span class="n">origin_start</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_descriptor</span><span class="o">.</span><span class="n">ranges</span><span class="o">.</span><span class="n">image_size</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_axis</span><span class="p">)</span>
+
+<div class="viewcode-block" id="SubImage.read_image"><a class="viewcode-back" href="../../../imagesplit.image.combined_image.html#imagesplit.image.combined_image.SubImage.read_image">[docs]</a>    <span class="k">def</span> <span class="nf">read_image</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">size</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns a subimage containing any overlap from the image&quot;&quot;&quot;</span>
+
+        <span class="c1"># Convert to local coordinates for the data source</span>
+        <span class="n">start_local</span><span class="p">,</span> <span class="n">size_local</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_transformer</span><span class="o">.</span><span class="n">to_local</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span>
+
+        <span class="c1"># Get the image data from the data source</span>
+        <span class="n">local_source</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_read_file</span><span class="p">()</span>
+        <span class="n">image_local</span> <span class="o">=</span> <span class="n">local_source</span><span class="o">.</span><span class="n">read_image</span><span class="p">(</span><span class="n">start_local</span><span class="p">,</span> <span class="n">size_local</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">SmartImage</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="n">start_local</span><span class="p">,</span>
+                          <span class="n">size</span><span class="o">=</span><span class="n">size_local</span><span class="p">,</span>
+                          <span class="n">image</span><span class="o">=</span><span class="n">image_local</span><span class="p">,</span>
+                          <span class="n">transformer</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_transformer</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SubImage.read_image_bound_by_roi"><a class="viewcode-back" href="../../../imagesplit.image.combined_image.html#imagesplit.image.combined_image.SubImage.read_image_bound_by_roi">[docs]</a>    <span class="k">def</span> <span class="nf">read_image_bound_by_roi</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">size</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns a subimage containing any overlap from the ROI&quot;&quot;&quot;</span>
+
+        <span class="c1"># Find the part of the requested region that fits in the ROI</span>
+        <span class="n">sub_start</span><span class="p">,</span> <span class="n">sub_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bind_by_roi</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span>
+
+        <span class="c1"># Check if any of region is contained in this subimage</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">greater</span><span class="p">(</span><span class="n">sub_size</span><span class="p">,</span> <span class="mi">0</span><span class="p">)):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_image</span><span class="p">(</span><span class="n">sub_start</span><span class="p">,</span> <span class="n">sub_size</span><span class="p">)</span>
+
+        <span class="c1"># Otherwise return None to indicate that the subimage is out of range</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="SubImage.close"><a class="viewcode-back" href="../../../imagesplit.image.combined_image.html#imagesplit.image.combined_image.SubImage.close">[docs]</a>    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Close all streams and files&quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_file</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_read_file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_read_file</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="SubImage.write_image"><a class="viewcode-back" href="../../../imagesplit.image.combined_image.html#imagesplit.image.combined_image.SubImage.write_image">[docs]</a>    <span class="k">def</span> <span class="nf">write_image</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">global_source</span><span class="p">,</span> <span class="n">rescale_limits</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Write out SubImage using data from the specified source&quot;&quot;&quot;</span>
+
+        <span class="n">out_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file_factory</span><span class="o">.</span><span class="n">create_write_file</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_descriptor</span><span class="p">)</span>
+        <span class="n">local_source</span> <span class="o">=</span> <span class="n">LocalSource</span><span class="p">(</span><span class="n">global_source</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_transformer</span><span class="p">)</span>
+        <span class="n">out_file</span><span class="o">.</span><span class="n">write_image</span><span class="p">(</span><span class="n">local_source</span><span class="p">,</span> <span class="n">rescale_limits</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SubImage.bind_by_roi"><a class="viewcode-back" href="../../../imagesplit.image.combined_image.html#imagesplit.image.combined_image.SubImage.bind_by_roi">[docs]</a>    <span class="k">def</span> <span class="nf">bind_by_roi</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start_global</span><span class="p">,</span> <span class="n">size_global</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Find the part of the specified region that fits within the ROI&quot;&quot;&quot;</span>
+
+        <span class="n">start</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">start_global</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_roi_start</span><span class="p">)</span>
+        <span class="n">end</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">start_global</span><span class="p">,</span> <span class="n">size_global</span><span class="p">),</span>
+                         <span class="n">np</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_roi_start</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_roi_size</span><span class="p">))</span>
+        <span class="n">size</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="n">end</span><span class="p">,</span> <span class="n">start</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">start</span><span class="p">,</span> <span class="n">size</span></div>
+
+<div class="viewcode-block" id="SubImage.get_limits"><a class="viewcode-back" href="../../../imagesplit.image.combined_image.html#imagesplit.image.combined_image.SubImage.get_limits">[docs]</a>    <span class="k">def</span> <span class="nf">get_limits</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return minimum and maximum values across all subimages&quot;&quot;&quot;</span>
+
+        <span class="n">image</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_image</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_descriptor</span><span class="o">.</span><span class="n">ranges</span><span class="o">.</span><span class="n">origin_start</span><span class="p">,</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">_descriptor</span><span class="o">.</span><span class="n">ranges</span><span class="o">.</span><span class="n">image_size</span><span class="p">)</span>
+
+        <span class="n">minv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">image</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">get_raw</span><span class="p">())</span>
+        <span class="n">maxv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">image</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">get_raw</span><span class="p">())</span>
+        <span class="k">return</span> <span class="n">minv</span><span class="p">,</span> <span class="n">maxv</span></div>
+
+    <span class="k">def</span> <span class="nf">_get_read_file</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_file</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_read_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file_factory</span><span class="o">.</span><span class="n">create_read_file</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_descriptor</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_file</span></div>
+
+
+<div class="viewcode-block" id="LocalSource"><a class="viewcode-back" href="../../../imagesplit.image.combined_image.html#imagesplit.image.combined_image.LocalSource">[docs]</a><span class="k">class</span> <span class="nc">LocalSource</span><span class="p">(</span><span class="n">Source</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Fetch and transform data using local coordinates&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">transformer</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_source</span> <span class="o">=</span> <span class="n">source</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_transformer</span> <span class="o">=</span> <span class="n">transformer</span>
+
+<div class="viewcode-block" id="LocalSource.read_image"><a class="viewcode-back" href="../../../imagesplit.image.combined_image.html#imagesplit.image.combined_image.LocalSource.read_image">[docs]</a>    <span class="k">def</span> <span class="nf">read_image</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">size</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns a partial image using the specified local coordinates&quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_source</span><span class="o">.</span><span class="n">read_image</span><span class="p">(</span>
+            <span class="n">start</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_transformer</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LocalSource.close"><a class="viewcode-back" href="../../../imagesplit.image.combined_image.html#imagesplit.image.combined_image.LocalSource.close">[docs]</a>    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Close all streams and files&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_source</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div></div>
+
+
+<div class="viewcode-block" id="CoordinateTransformer"><a class="viewcode-back" href="../../../imagesplit.image.combined_image.html#imagesplit.image.combined_image.CoordinateTransformer">[docs]</a><span class="k">class</span> <span class="nc">CoordinateTransformer</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Convert coordinates between orthogonal systems&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">origin</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">axis</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create a transformer object for converting between systems</span>
+
+<span class="sd">        :param origin: local coordinate origin in global coordinates</span>
+<span class="sd">        :param size: size of the local frame in global coordinates</span>
+<span class="sd">        :param dim_ordering: ordering of local dimensions</span>
+<span class="sd">        :param dim_flip: whether local axes should be flipped</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_origin</span> <span class="o">=</span> <span class="n">origin</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_size</span> <span class="o">=</span> <span class="n">size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">axis</span> <span class="o">=</span> <span class="n">axis</span>
+
+        <span class="n">size_t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_size</span><span class="p">)[</span><span class="bp">self</span><span class="o">.</span><span class="n">axis</span><span class="o">.</span><span class="n">dim_order</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_flip_offset</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">axis</span><span class="o">.</span><span class="n">dim_flip</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_flip_multiple</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">axis</span><span class="o">.</span><span class="n">dim_flip</span><span class="p">))</span>
+
+        <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">flip</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">axis</span><span class="o">.</span><span class="n">dim_flip</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">flip</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_flip_offset</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="n">size_t</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span>
+
+<div class="viewcode-block" id="CoordinateTransformer.to_local"><a class="viewcode-back" href="../../../imagesplit.image.combined_image.html#imagesplit.image.combined_image.CoordinateTransformer.to_local">[docs]</a>    <span class="k">def</span> <span class="nf">to_local</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">global_start</span><span class="p">,</span> <span class="n">global_size</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Convert global coordinates to local coordinates&quot;&quot;&quot;</span>
+
+        <span class="c1"># Translate coordinates to the local origin</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="n">global_start</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_origin</span><span class="p">)</span>
+        <span class="n">size</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">global_size</span><span class="p">)</span>  <span class="c1"># Make sure global_size is a numpy array</span>
+
+        <span class="c1"># Permute dimensions of local coordinates</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="n">start</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">axis</span><span class="o">.</span><span class="n">dim_order</span><span class="p">]</span>
+        <span class="n">size</span> <span class="o">=</span> <span class="n">size</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">axis</span><span class="o">.</span><span class="n">dim_order</span><span class="p">]</span>
+
+        <span class="c1"># Flip dimensions where necessary</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_flip_multiple</span><span class="p">),</span>
+                       <span class="bp">self</span><span class="o">.</span><span class="n">_flip_offset</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">start</span><span class="p">,</span> <span class="n">size</span></div>
+
+<div class="viewcode-block" id="CoordinateTransformer.to_other"><a class="viewcode-back" href="../../../imagesplit.image.combined_image.html#imagesplit.image.combined_image.CoordinateTransformer.to_other">[docs]</a>    <span class="k">def</span> <span class="nf">to_other</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">local_start</span><span class="p">,</span> <span class="n">local_size</span><span class="p">,</span> <span class="n">other_transformer</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Convert local coordinates to a different local system&quot;&quot;&quot;</span>
+
+        <span class="n">global_start</span><span class="p">,</span> <span class="n">global_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_global</span><span class="p">(</span><span class="n">local_start</span><span class="p">,</span> <span class="n">local_size</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">other_transformer</span><span class="o">.</span><span class="n">to_local</span><span class="p">(</span><span class="n">global_start</span><span class="p">,</span> <span class="n">global_size</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CoordinateTransformer.to_global"><a class="viewcode-back" href="../../../imagesplit.image.combined_image.html#imagesplit.image.combined_image.CoordinateTransformer.to_global">[docs]</a>    <span class="k">def</span> <span class="nf">to_global</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">local_start</span><span class="p">,</span> <span class="n">local_size</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Convert local coordinates to global coordinates&quot;&quot;&quot;</span>
+
+        <span class="n">start</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">local_start</span><span class="p">)</span>
+        <span class="n">size</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">local_size</span><span class="p">)</span>
+
+        <span class="c1"># Flip dimensions where necessary</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_flip_multiple</span><span class="p">),</span>
+                       <span class="bp">self</span><span class="o">.</span><span class="n">_flip_offset</span><span class="p">)</span>
+
+        <span class="c1"># Reverse permute dimensions of local coordinates</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="n">start</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">axis</span><span class="o">.</span><span class="n">reverse_dim_order</span><span class="p">]</span>
+        <span class="n">size</span> <span class="o">=</span> <span class="n">size</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">axis</span><span class="o">.</span><span class="n">reverse_dim_order</span><span class="p">]</span>
+
+        <span class="c1"># Translate coordinates to the global origin</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_origin</span><span class="p">)</span>
+        <span class="n">size</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">size</span><span class="p">)</span>  <span class="c1"># Make sure global_size is a numpy array</span>
+
+        <span class="k">return</span> <span class="n">start</span><span class="p">,</span> <span class="n">size</span></div>
+
+<div class="viewcode-block" id="CoordinateTransformer.image_to_local"><a class="viewcode-back" href="../../../imagesplit.image.combined_image.html#imagesplit.image.combined_image.CoordinateTransformer.image_to_local">[docs]</a>    <span class="k">def</span> <span class="nf">image_to_local</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">global_image</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Transform global image to local coordinate system&quot;&quot;&quot;</span>
+
+        <span class="n">local_image</span> <span class="o">=</span> <span class="n">global_image</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">axis</span><span class="o">.</span><span class="n">dim_order</span><span class="p">)</span>
+
+        <span class="c1"># Flip dimensions where necessary</span>
+        <span class="n">local_image</span> <span class="o">=</span> <span class="n">local_image</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">axis</span><span class="o">.</span><span class="n">dim_flip</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">local_image</span></div>
+
+<div class="viewcode-block" id="CoordinateTransformer.image_to_other"><a class="viewcode-back" href="../../../imagesplit.image.combined_image.html#imagesplit.image.combined_image.CoordinateTransformer.image_to_other">[docs]</a>    <span class="k">def</span> <span class="nf">image_to_other</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">local_image</span><span class="p">,</span> <span class="n">other_transformer</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Transform image to a different local coordinate system&quot;&quot;&quot;</span>
+
+        <span class="c1"># Flip dimensions where necessary</span>
+        <span class="n">local_image</span> <span class="o">=</span> <span class="n">local_image</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">axis</span><span class="o">.</span><span class="n">dim_flip</span><span class="p">)</span>
+
+        <span class="c1"># Reverse permute dimensions of local coordinates</span>
+        <span class="n">global_dim_order</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">axis</span><span class="o">.</span><span class="n">reverse_dim_order</span><span class="p">)</span>
+        <span class="n">global_flip</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">axis</span><span class="o">.</span><span class="n">dim_flip</span><span class="p">)[</span><span class="n">global_dim_order</span><span class="p">]</span>
+        <span class="n">local_dim_order</span> <span class="o">=</span> <span class="n">global_dim_order</span><span class="p">[</span><span class="n">other_transformer</span><span class="o">.</span><span class="n">axis</span><span class="o">.</span><span class="n">dim_order</span><span class="p">]</span>
+        <span class="n">local_image</span> <span class="o">=</span> <span class="n">local_image</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">local_dim_order</span><span class="p">)</span>
+        <span class="n">local_flip</span> <span class="o">=</span> <span class="n">global_flip</span><span class="p">[</span><span class="n">other_transformer</span><span class="o">.</span><span class="n">axis</span><span class="o">.</span><span class="n">dim_order</span><span class="p">]</span>
+        <span class="n">local_flip</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_xor</span><span class="p">(</span><span class="n">local_flip</span><span class="p">,</span>
+                                    <span class="n">other_transformer</span><span class="o">.</span><span class="n">axis</span><span class="o">.</span><span class="n">dim_flip</span><span class="p">)</span>
+
+        <span class="c1"># Flip dimensions where necessary</span>
+        <span class="n">local_image</span> <span class="o">=</span> <span class="n">local_image</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="n">local_flip</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">local_image</span></div>
+
+<div class="viewcode-block" id="CoordinateTransformer.image_to_global"><a class="viewcode-back" href="../../../imagesplit.image.combined_image.html#imagesplit.image.combined_image.CoordinateTransformer.image_to_global">[docs]</a>    <span class="k">def</span> <span class="nf">image_to_global</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">local_image</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Convert local coordinates to global coordinates&quot;&quot;&quot;</span>
+
+        <span class="c1"># Flip dimensions where necessary</span>
+        <span class="n">local_image</span> <span class="o">=</span> <span class="n">local_image</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">axis</span><span class="o">.</span><span class="n">dim_flip</span><span class="p">)</span>
+
+        <span class="c1"># Reverse permute dimensions of local coordinates</span>
+        <span class="n">global_image</span> <span class="o">=</span> <span class="n">local_image</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">axis</span><span class="o">.</span><span class="n">reverse_dim_order</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">global_image</span></div></div>
+
+
+<div class="viewcode-block" id="Axis"><a class="viewcode-back" href="../../../imagesplit.image.combined_image.html#imagesplit.image.combined_image.Axis">[docs]</a><span class="k">class</span> <span class="nc">Axis</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Defines coordinate system used by image coordinates&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dim_order</span><span class="p">,</span> <span class="n">dim_flip</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dim_order</span> <span class="o">=</span> <span class="n">dim_order</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dim_flip</span> <span class="o">=</span> <span class="n">dim_flip</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reverse_dim_order</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">dim_order</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+
+<div class="viewcode-block" id="Axis.to_condensed_format"><a class="viewcode-back" href="../../../imagesplit.image.combined_image.html#imagesplit.image.combined_image.Axis.to_condensed_format">[docs]</a>    <span class="k">def</span> <span class="nf">to_condensed_format</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Creates a condensed Axis array for this Axis&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span> <span class="o">-</span> <span class="n">dim</span> <span class="k">if</span> <span class="n">flip</span> <span class="k">else</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">dim</span> <span class="k">for</span> <span class="n">dim</span><span class="p">,</span> <span class="n">flip</span> <span class="ow">in</span>
+                <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dim_order</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim_flip</span><span class="p">)]</span></div>
+
+<div class="viewcode-block" id="Axis.from_condensed_format"><a class="viewcode-back" href="../../../imagesplit.image.combined_image.html#imagesplit.image.combined_image.Axis.from_condensed_format">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">from_condensed_format</span><span class="p">(</span><span class="n">dim_order_and_flip</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Creates an Axis from a condensed axis array&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">equal</span><span class="p">(</span><span class="n">dim_order_and_flip</span><span class="p">,</span> <span class="mi">0</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Dimensions are numbered from 1&#39;</span><span class="p">)</span>
+        <span class="n">dim_order</span> <span class="o">=</span> <span class="p">[</span><span class="nb">abs</span><span class="p">(</span><span class="n">d</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">dim_order_and_flip</span><span class="p">]</span>
+        <span class="n">dim_flip</span> <span class="o">=</span> <span class="p">[</span><span class="n">d</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">dim_order_and_flip</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">Axis</span><span class="p">(</span><span class="n">dim_order</span><span class="o">=</span><span class="n">dim_order</span><span class="p">,</span> <span class="n">dim_flip</span><span class="o">=</span><span class="n">dim_flip</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="vm">__dict__</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="k">def</span> <span class="fm">__ne__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__eq__</span><span class="p">(</span><span class="n">other</span><span class="p">)</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../../index.html">
+              <img class="logo" src="../../../_static/giftsurg-icon.png" alt="Logo"/>
+            </a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">ImageSplit  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">imagesplit.image.combined_image</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, UCL.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.5.1.
+    </div>
+  </body>
+</html>

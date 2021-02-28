@@ -1,0 +1,164 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>imagesplit.file.tiff_file_reader &#8212; ImageSplit  documentation</title>
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/classic.css" type="text/css" />
+    
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">ImageSplit  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">imagesplit.file.tiff_file_reader</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for imagesplit.file.tiff_file_reader</h1><div class="highlight"><pre>
+<span></span><span class="c1"># coding=utf-8</span>
+
+<span class="sd">&quot;&quot;&quot;Read and write data to TIFF files&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span><span class="p">,</span> <span class="n">TiffImagePlugin</span>
+
+<span class="kn">from</span> <span class="nn">imagesplit.file.data_type</span> <span class="kn">import</span> <span class="n">DataType</span>
+<span class="kn">from</span> <span class="nn">imagesplit.file.image_file_reader</span> <span class="kn">import</span> <span class="n">BlockImageFileReader</span>
+
+
+<div class="viewcode-block" id="TiffFileReader"><a class="viewcode-back" href="../../../imagesplit.file.tiff_file_reader.html#imagesplit.file.tiff_file_reader.TiffFileReader">[docs]</a><span class="k">class</span> <span class="nc">TiffFileReader</span><span class="p">(</span><span class="n">BlockImageFileReader</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Read and write to TIFF files&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">image_size</span><span class="p">,</span> <span class="n">data_type</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">TiffFileReader</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">image_size</span><span class="p">,</span> <span class="n">data_type</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cached_image</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">filename</span> <span class="o">=</span> <span class="n">filename</span>
+
+<div class="viewcode-block" id="TiffFileReader.close_file"><a class="viewcode-back" href="../../../imagesplit.file.tiff_file_reader.html#imagesplit.file.tiff_file_reader.TiffFileReader.close_file">[docs]</a>    <span class="k">def</span> <span class="nf">close_file</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Closes file if required&quot;&quot;&quot;</span></div>
+
+<div class="viewcode-block" id="TiffFileReader.load"><a class="viewcode-back" href="../../../imagesplit.file.tiff_file_reader.html#imagesplit.file.tiff_file_reader.TiffFileReader.load">[docs]</a>    <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Load image data from TIFF file&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">cached_image</span><span class="p">:</span>
+            <span class="n">img</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cached_image</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">img</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">cached_image</span></div>
+
+<div class="viewcode-block" id="TiffFileReader.save"><a class="viewcode-back" href="../../../imagesplit.file.tiff_file_reader.html#imagesplit.file.tiff_file_reader.TiffFileReader.save">[docs]</a>    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Save out image data into TIFF file&quot;&quot;&quot;</span>
+        <span class="n">compression</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_type</span><span class="o">.</span><span class="n">compression</span>
+
+        <span class="k">if</span> <span class="n">compression</span> <span class="o">==</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span>
+            <span class="n">compression</span> <span class="o">=</span> <span class="s1">&#39;tiff_adobe_deflate&#39;</span>
+
+        <span class="k">if</span> <span class="n">compression</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span>
+                               <span class="s1">&#39;packbits&#39;</span><span class="p">,</span>
+                               <span class="s1">&#39;tiff_deflate&#39;</span><span class="p">,</span>
+                               <span class="s1">&#39;tiff_adobe_deflate&#39;</span><span class="p">,</span>
+                               <span class="s1">&#39;tiff_sgilog23&#39;</span><span class="p">,</span>
+                               <span class="s1">&#39;tiff_raw16&#39;</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="n">compression</span> <span class="o">+</span> <span class="s1">&#39; compression not supported for TIFF files&#39;</span><span class="p">)</span>
+
+        <span class="n">img</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">fromarray</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">compression</span><span class="p">:</span>
+            <span class="c1"># Set WRITE_LIBTIFF to true for compression, but restore previous</span>
+            <span class="c1"># value afterwards in case user has deliberately set a value</span>
+            <span class="n">write_libtiff_previous_value</span> <span class="o">=</span> <span class="n">TiffImagePlugin</span><span class="o">.</span><span class="n">WRITE_LIBTIFF</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">TiffImagePlugin</span><span class="o">.</span><span class="n">WRITE_LIBTIFF</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="n">img</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">,</span> <span class="n">compression</span><span class="o">=</span><span class="n">compression</span><span class="p">)</span>
+
+            <span class="k">finally</span><span class="p">:</span>
+                <span class="n">TiffImagePlugin</span><span class="o">.</span><span class="n">WRITE_LIBTIFF</span> <span class="o">=</span> <span class="n">write_libtiff_previous_value</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">img</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TiffFileReader.create_write_file"><a class="viewcode-back" href="../../../imagesplit.file.tiff_file_reader.html#imagesplit.file.tiff_file_reader.TiffFileReader.create_write_file">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="c1"># pylint: disable=unused-argument</span>
+    <span class="k">def</span> <span class="nf">create_write_file</span><span class="p">(</span><span class="n">subimage_descriptor</span><span class="p">,</span> <span class="n">file_handle_factory</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create a TiffFileReader class for this filename and template&quot;&quot;&quot;</span>
+        <span class="n">filename</span> <span class="o">=</span> <span class="n">subimage_descriptor</span><span class="o">.</span><span class="n">filename</span>
+        <span class="n">local_file_size</span> <span class="o">=</span> <span class="n">subimage_descriptor</span><span class="o">.</span><span class="n">get_local_size</span><span class="p">()</span>
+        <span class="n">byte_order_msb</span> <span class="o">=</span> <span class="n">subimage_descriptor</span><span class="o">.</span><span class="n">msb</span>
+        <span class="n">compression</span> <span class="o">=</span> <span class="n">subimage_descriptor</span><span class="o">.</span><span class="n">compression</span>
+        <span class="n">data_type</span> <span class="o">=</span> <span class="n">DataType</span><span class="p">(</span><span class="n">subimage_descriptor</span><span class="o">.</span><span class="n">data_type</span><span class="p">,</span>
+                             <span class="n">byte_order_msb</span><span class="o">=</span><span class="n">byte_order_msb</span><span class="p">,</span>
+                             <span class="n">compression</span><span class="o">=</span><span class="n">compression</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">TiffFileReader</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">local_file_size</span><span class="p">,</span> <span class="n">data_type</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TiffFileReader.add_filename_suffix"><a class="viewcode-back" href="../../../imagesplit.file.tiff_file_reader.html#imagesplit.file.tiff_file_reader.TiffFileReader.add_filename_suffix">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">add_filename_suffix</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">suffix</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Adds a suffix to to the filename before the extension&quot;&quot;&quot;</span>
+        <span class="n">name</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s2">&quot;</span><span class="si">{name}</span><span class="s2">_</span><span class="si">{suffix}{ext}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="n">suffix</span><span class="p">,</span> <span class="n">ext</span><span class="o">=</span><span class="n">ext</span><span class="p">)</span></div></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../../index.html">
+              <img class="logo" src="../../../_static/giftsurg-icon.png" alt="Logo"/>
+            </a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">ImageSplit  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">imagesplit.file.tiff_file_reader</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, UCL.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.5.1.
+    </div>
+  </body>
+</html>

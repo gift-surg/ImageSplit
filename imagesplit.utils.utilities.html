@@ -1,0 +1,180 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>imagesplit.utils.utilities module &#8212; ImageSplit  documentation</title>
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">ImageSplit  documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">imagesplit.utils.utilities module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-imagesplit.utils.utilities">
+<span id="imagesplit-utils-utilities-module"></span><h1>imagesplit.utils.utilities module<a class="headerlink" href="#module-imagesplit.utils.utilities" title="Permalink to this headline">¶</a></h1>
+<p>Utility files for splitting large images into subimages</p>
+<p>Author: Tom Doel
+Copyright UCL 2017</p>
+<dl class="py function">
+<dt id="imagesplit.utils.utilities.compute_bytes_per_voxel">
+<code class="sig-prename descclassname"><span class="pre">imagesplit.utils.utilities.</span></code><code class="sig-name descname"><span class="pre">compute_bytes_per_voxel</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">element_type</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/utils/utilities.html#compute_bytes_per_voxel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.utils.utilities.compute_bytes_per_voxel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns number of bytes required to store one voxel for the given
+metaIO ElementType</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="imagesplit.utils.utilities.convert_to_array">
+<code class="sig-prename descclassname"><span class="pre">imagesplit.utils.utilities.</span></code><code class="sig-name descname"><span class="pre">convert_to_array</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scalar_or_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameter_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_dims</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/utils/utilities.html#convert_to_array"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.utils.utilities.convert_to_array" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts a list or scalar to an array</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="imagesplit.utils.utilities.file_linear_byte_offset">
+<code class="sig-prename descclassname"><span class="pre">imagesplit.utils.utilities.</span></code><code class="sig-name descname"><span class="pre">file_linear_byte_offset</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bytes_per_voxel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_coords</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/utils/utilities.html#file_linear_byte_offset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.utils.utilities.file_linear_byte_offset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the file byte offset corresponding to the given coordinates.
+Files generally assumed to have the first dimension most rapidly changing</p>
+<p>Assumes you have a stream of bytes representing a multi-dimensional image,</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="imagesplit.utils.utilities.get_block_coordinate_range">
+<code class="sig-prename descclassname"><span class="pre">imagesplit.utils.utilities.</span></code><code class="sig-name descname"><span class="pre">get_block_coordinate_range</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">block_number</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">block_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overlap_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_size</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/utils/utilities.html#get_block_coordinate_range"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.utils.utilities.get_block_coordinate_range" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the minimum and maximum coordinate values in one dimension for
+an image block, where the dimension length image_size is to be split into
+the number of blocks specified by block_size with an overlap of
+overlap_size voxels at each boundary, and the current block_number is
+specified. There is no overlap at the outer border of the image, and the
+length of the final block is reduced if necessary so there is no padding</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="imagesplit.utils.utilities.get_number_of_blocks">
+<code class="sig-prename descclassname"><span class="pre">imagesplit.utils.utilities.</span></code><code class="sig-name descname"><span class="pre">get_number_of_blocks</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_block_size</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/utils/utilities.html#get_number_of_blocks"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.utils.utilities.get_number_of_blocks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a list containing the number of blocks in each dimension
+required to split the image into blocks that are subject to a maximum
+size limit</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="imagesplit.utils.utilities.get_numpy_datatype">
+<code class="sig-prename descclassname"><span class="pre">imagesplit.utils.utilities.</span></code><code class="sig-name descname"><span class="pre">get_numpy_datatype</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">element_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">byte_order_msb</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/utils/utilities.html#get_numpy_datatype"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.utils.utilities.get_numpy_datatype" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the numpy datatype corresponding to this ElementType</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="imagesplit.utils.utilities.get_suggested_block_size">
+<code class="sig-prename descclassname"><span class="pre">imagesplit.utils.utilities.</span></code><code class="sig-name descname"><span class="pre">get_suggested_block_size</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">number_of_blocks</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/utils/utilities.html#get_suggested_block_size"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.utils.utilities.get_suggested_block_size" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a recommended block size (a list of the number of blocks in
+each dimension) to allow the specified image_size to be split into the
+specified number of blocks in each dimension, with each block being
+roughly equal in size</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="imagesplit.utils.utilities.ranges_for_max_block_size">
+<code class="sig-prename descclassname"><span class="pre">imagesplit.utils.utilities.</span></code><code class="sig-name descname"><span class="pre">ranges_for_max_block_size</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_block_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overlap_size</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/utils/utilities.html#ranges_for_max_block_size"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.utils.utilities.ranges_for_max_block_size" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a list of ranges, where each recommended block size (a list of
+the number of blocks in each dimension) is set such that no block exceeds
+the specified maximum size, and the specified image_size
+is split so that each block is roughly equal in size</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="imagesplit.utils.utilities.ranges_for_number_of_blocks">
+<code class="sig-prename descclassname"><span class="pre">imagesplit.utils.utilities.</span></code><code class="sig-name descname"><span class="pre">ranges_for_number_of_blocks</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">number_of_blocks</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overlap_size</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/utils/utilities.html#ranges_for_number_of_blocks"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.utils.utilities.ranges_for_number_of_blocks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a list of ranges, where each recommended block size (a list of
+the number of blocks in each dimension) is set to allow the specified
+image_size to be split into the specified number of blocks in each
+dimension, with each block being roughly equal in size</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="imagesplit.utils.utilities.rescale_image">
+<code class="sig-prename descclassname"><span class="pre">imagesplit.utils.utilities.</span></code><code class="sig-name descname"><span class="pre">rescale_image</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_line</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rescale_limits</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/utils/utilities.html#rescale_image"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.utils.utilities.rescale_image" title="Permalink to this definition">¶</a></dt>
+<dd><p>Rescale image to the limits of this datatype</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="imagesplit.utils.utilities.to_rgb">
+<code class="sig-prename descclassname"><span class="pre">imagesplit.utils.utilities.</span></code><code class="sig-name descname"><span class="pre">to_rgb</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_line</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/utils/utilities.html#to_rgb"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.utils.utilities.to_rgb" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert greyscale array to RGB</p>
+</dd></dl>
+
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/giftsurg-icon.png" alt="Logo"/>
+            </a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/imagesplit.utils.utilities.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">ImageSplit  documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">imagesplit.utils.utilities module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, UCL.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.5.1.
+    </div>
+  </body>
+</html>

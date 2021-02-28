@@ -1,0 +1,7 @@
+imagesplit.utils.utilities module
+=================================
+
+.. automodule:: imagesplit.utils.utilities
+   :members:
+   :undoc-members:
+   :show-inheritance:

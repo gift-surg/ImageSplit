@@ -1,0 +1,7 @@
+imagesplit.image.image\_wrapper module
+======================================
+
+.. automodule:: imagesplit.image.image_wrapper
+   :members:
+   :undoc-members:
+   :show-inheritance:

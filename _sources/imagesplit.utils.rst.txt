@@ -1,0 +1,22 @@
+imagesplit.utils package
+========================
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 4
+
+   imagesplit.utils.file_descriptor
+   imagesplit.utils.json_reader
+   imagesplit.utils.utilities
+   imagesplit.utils.versioneer_version
+   imagesplit.utils.versioning
+
+Module contents
+---------------
+
+.. automodule:: imagesplit.utils
+   :members:
+   :undoc-members:
+   :show-inheritance:

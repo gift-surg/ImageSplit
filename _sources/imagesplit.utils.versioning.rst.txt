@@ -1,0 +1,7 @@
+imagesplit.utils.versioning module
+==================================
+
+.. automodule:: imagesplit.utils.versioning
+   :members:
+   :undoc-members:
+   :show-inheritance:

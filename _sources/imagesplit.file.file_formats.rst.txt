@@ -1,0 +1,7 @@
+imagesplit.file.file\_formats module
+====================================
+
+.. automodule:: imagesplit.file.file_formats
+   :members:
+   :undoc-members:
+   :show-inheritance:

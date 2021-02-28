@@ -1,0 +1,9 @@
+ImageSplit
+==========
+
+.. toctree::
+   :maxdepth: 4
+
+   imagesplit
+   imagesplit
+   versioneer

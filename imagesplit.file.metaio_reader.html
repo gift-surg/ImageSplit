@@ -1,0 +1,243 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>imagesplit.file.metaio_reader module &#8212; ImageSplit  documentation</title>
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">ImageSplit  documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">imagesplit.file.metaio_reader module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-imagesplit.file.metaio_reader">
+<span id="imagesplit-file-metaio-reader-module"></span><h1>imagesplit.file.metaio_reader module<a class="headerlink" href="#module-imagesplit.file.metaio_reader" title="Permalink to this headline">¶</a></h1>
+<p>Utility for reading and writing data to metaio (mhd/mha) files</p>
+<p>Author: Tom Doel
+Copyright UCL 2017</p>
+<dl class="py class">
+<dt id="imagesplit.file.metaio_reader.MetaIoFile">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">imagesplit.file.metaio_reader.</span></code><code class="sig-name descname"><span class="pre">MetaIoFile</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">local_file_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">header_filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_handle_factory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">header_template</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/file/metaio_reader.html#MetaIoFile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.file.metaio_reader.MetaIoFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="imagesplit.file.image_file_reader.html#imagesplit.file.image_file_reader.LinearImageFileReader" title="imagesplit.file.image_file_reader.LinearImageFileReader"><code class="xref py py-class docutils literal notranslate"><span class="pre">imagesplit.file.image_file_reader.LinearImageFileReader</span></code></a></p>
+<p>A class for reading or writing 3D imaging data to/from a MetaIO file
+pair (.mhd and .raw).</p>
+<dl class="py method">
+<dt id="imagesplit.file.metaio_reader.MetaIoFile.close">
+<code class="sig-name descname"><span class="pre">close</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/file/metaio_reader.html#MetaIoFile.close"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.file.metaio_reader.MetaIoFile.close" title="Permalink to this definition">¶</a></dt>
+<dd><p>Close the files associated with this image, if they are not
+already closed.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="imagesplit.file.metaio_reader.MetaIoFile.close_file">
+<code class="sig-name descname"><span class="pre">close_file</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/file/metaio_reader.html#MetaIoFile.close_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.file.metaio_reader.MetaIoFile.close_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Close file</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="imagesplit.file.metaio_reader.MetaIoFile.create_read_file">
+<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">create_read_file</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subimage_descriptor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_handle_factory</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/file/metaio_reader.html#MetaIoFile.create_read_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.file.metaio_reader.MetaIoFile.create_read_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a MetaIoFile class for writing</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="imagesplit.file.metaio_reader.MetaIoFile.create_write_file">
+<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">create_write_file</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subimage_descriptor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_handle_factory</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/file/metaio_reader.html#MetaIoFile.create_write_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.file.metaio_reader.MetaIoFile.create_write_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a MetaIoFile class for this filename and template</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="imagesplit.file.metaio_reader.MetaIoFile.get_bytes_per_voxel">
+<code class="sig-name descname"><span class="pre">get_bytes_per_voxel</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/file/metaio_reader.html#MetaIoFile.get_bytes_per_voxel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.file.metaio_reader.MetaIoFile.get_bytes_per_voxel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the number of bytes used to represent a single voxel in
+this image.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="imagesplit.file.metaio_reader.MetaIoFile.get_dimension_ordering">
+<code class="sig-name descname"><span class="pre">get_dimension_ordering</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/file/metaio_reader.html#MetaIoFile.get_dimension_ordering"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.file.metaio_reader.MetaIoFile.get_dimension_ordering" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the preferred dimension ordering for writing data.</p>
+<p>Returns an array of 3 element, where each element represents a
+dimension in the global coordinate system numbered from 1 to 3 and
+is positive if data are to be written in ascending coordinates (in
+the global system) or negative if to be written in descending global
+coordinates along that dimension</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="imagesplit.file.metaio_reader.MetaIoFile.load_and_parse_header">
+<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">load_and_parse_header</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/file/metaio_reader.html#MetaIoFile.load_and_parse_header"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.file.metaio_reader.MetaIoFile.load_and_parse_header" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads a MetaIO header file and parses</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="imagesplit.file.metaio_reader.MetaIoFile.read_line">
+<code class="sig-name descname"><span class="pre">read_line</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start_coords</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_voxels_to_read</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/file/metaio_reader.html#MetaIoFile.read_line"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.file.metaio_reader.MetaIoFile.read_line" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read consecutive voxels of image data from the raw binary file
+starting at the specified coordinates.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="imagesplit.file.metaio_reader.MetaIoFile.write_line">
+<code class="sig-name descname"><span class="pre">write_line</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start_coords</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_line</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rescale_limits</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/file/metaio_reader.html#MetaIoFile.write_line"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.file.metaio_reader.MetaIoFile.write_line" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write consecutive voxels to the raw binary file.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt id="imagesplit.file.metaio_reader.anatomical_to_cosine">
+<code class="sig-prename descclassname"><span class="pre">imagesplit.file.metaio_reader.</span></code><code class="sig-name descname"><span class="pre">anatomical_to_cosine</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">anatomical_orientation_char</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/file/metaio_reader.html#anatomical_to_cosine"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.file.metaio_reader.anatomical_to_cosine" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get Dicom direction cosine for this orientation string</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="imagesplit.file.metaio_reader.anatomical_to_permutation">
+<code class="sig-prename descclassname"><span class="pre">imagesplit.file.metaio_reader.</span></code><code class="sig-name descname"><span class="pre">anatomical_to_permutation</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">anatomical_orientation_string</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/file/metaio_reader.html#anatomical_to_permutation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.file.metaio_reader.anatomical_to_permutation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dimension permutation vector corresponding to this orientation string</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="imagesplit.file.metaio_reader.condensed_to_cosine">
+<code class="sig-prename descclassname"><span class="pre">imagesplit.file.metaio_reader.</span></code><code class="sig-name descname"><span class="pre">condensed_to_cosine</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">condensed_format</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/file/metaio_reader.html#condensed_to_cosine"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.file.metaio_reader.condensed_to_cosine" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get mhd direction cosine for this condensed format axis</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="imagesplit.file.metaio_reader.dimensions_from_orientations">
+<code class="sig-prename descclassname"><span class="pre">imagesplit.file.metaio_reader.</span></code><code class="sig-name descname"><span class="pre">dimensions_from_orientations</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">orientation_vector_1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">orientation_vector_2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/file/metaio_reader.html#dimensions_from_orientations"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.file.metaio_reader.dimensions_from_orientations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get dimension permutation vectors for these orientation vectors</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="imagesplit.file.metaio_reader.get_condensed_dim_order">
+<code class="sig-prename descclassname"><span class="pre">imagesplit.file.metaio_reader.</span></code><code class="sig-name descname"><span class="pre">get_condensed_dim_order</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">header</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/file/metaio_reader.html#get_condensed_dim_order"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.file.metaio_reader.get_condensed_dim_order" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the condensed dimension order and flip string for this header</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="imagesplit.file.metaio_reader.get_default_metadata">
+<code class="sig-prename descclassname"><span class="pre">imagesplit.file.metaio_reader.</span></code><code class="sig-name descname"><span class="pre">get_default_metadata</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/file/metaio_reader.html#get_default_metadata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.file.metaio_reader.get_default_metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return an OrderedDict containing default mhd file metadata</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="imagesplit.file.metaio_reader.get_flip_from_orientations">
+<code class="sig-prename descclassname"><span class="pre">imagesplit.file.metaio_reader.</span></code><code class="sig-name descname"><span class="pre">get_flip_from_orientations</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">orientation_1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">orientation_2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">orientation_3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dimension_1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dimension_2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dimension_3</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/file/metaio_reader.html#get_flip_from_orientations"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.file.metaio_reader.get_flip_from_orientations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get dimension flip vectors for these orientation vectors</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="imagesplit.file.metaio_reader.load_mhd_header">
+<code class="sig-prename descclassname"><span class="pre">imagesplit.file.metaio_reader.</span></code><code class="sig-name descname"><span class="pre">load_mhd_header</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/file/metaio_reader.html#load_mhd_header"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.file.metaio_reader.load_mhd_header" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return an OrderedDict containing metadata loaded from an mhd file.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="imagesplit.file.metaio_reader.mhd_cosines_to_permutation">
+<code class="sig-prename descclassname"><span class="pre">imagesplit.file.metaio_reader.</span></code><code class="sig-name descname"><span class="pre">mhd_cosines_to_permutation</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">direction_cosine_1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">direction_cosine_2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">direction_cosine_3</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/file/metaio_reader.html#mhd_cosines_to_permutation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.file.metaio_reader.mhd_cosines_to_permutation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get dimension permutation vectors for these mhd direction cosines</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="imagesplit.file.metaio_reader.parse_mhd">
+<code class="sig-prename descclassname"><span class="pre">imagesplit.file.metaio_reader.</span></code><code class="sig-name descname"><span class="pre">parse_mhd</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">header</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/file/metaio_reader.html#parse_mhd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.file.metaio_reader.parse_mhd" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read a metaheader and returns a FileImageDescriptor</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="imagesplit.file.metaio_reader.permutation_from_orientations">
+<code class="sig-prename descclassname"><span class="pre">imagesplit.file.metaio_reader.</span></code><code class="sig-name descname"><span class="pre">permutation_from_orientations</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">orientation_1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">orientation_2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/file/metaio_reader.html#permutation_from_orientations"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.file.metaio_reader.permutation_from_orientations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get dimension permutation vectors for these orientation vectors</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="imagesplit.file.metaio_reader.permutation_to_cosine">
+<code class="sig-prename descclassname"><span class="pre">imagesplit.file.metaio_reader.</span></code><code class="sig-name descname"><span class="pre">permutation_to_cosine</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">permutation</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flip</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/file/metaio_reader.html#permutation_to_cosine"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.file.metaio_reader.permutation_to_cosine" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get mhd direction cosine for this dimension permutation</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="imagesplit.file.metaio_reader.save_mhd_header">
+<code class="sig-prename descclassname"><span class="pre">imagesplit.file.metaio_reader.</span></code><code class="sig-name descname"><span class="pre">save_mhd_header</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/file/metaio_reader.html#save_mhd_header"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.file.metaio_reader.save_mhd_header" title="Permalink to this definition">¶</a></dt>
+<dd><p>Saves a mhd header file to disk using the given metadata</p>
+</dd></dl>
+
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/giftsurg-icon.png" alt="Logo"/>
+            </a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/imagesplit.file.metaio_reader.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">ImageSplit  documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">imagesplit.file.metaio_reader module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, UCL.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.5.1.
+    </div>
+  </body>
+</html>

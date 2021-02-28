@@ -1,0 +1,511 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>imagesplit.file.metaio_reader &#8212; ImageSplit  documentation</title>
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/classic.css" type="text/css" />
+    
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">ImageSplit  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">imagesplit.file.metaio_reader</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for imagesplit.file.metaio_reader</h1><div class="highlight"><pre>
+<span></span><span class="c1"># coding=utf-8</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Utility for reading and writing data to metaio (mhd/mha) files</span>
+
+<span class="sd">Author: Tom Doel</span>
+<span class="sd">Copyright UCL 2017</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">imagesplit.file.data_type</span> <span class="kn">import</span> <span class="n">DataType</span>
+<span class="kn">from</span> <span class="nn">imagesplit.file.file_image_descriptor</span> <span class="kn">import</span> <span class="n">FileImageDescriptor</span>
+<span class="kn">from</span> <span class="nn">imagesplit.file.file_wrapper</span> <span class="kn">import</span> <span class="n">FileWrapper</span><span class="p">,</span> <span class="n">FileStreamer</span>
+<span class="kn">from</span> <span class="nn">imagesplit.file.image_file_reader</span> <span class="kn">import</span> <span class="n">LinearImageFileReader</span>
+<span class="kn">from</span> <span class="nn">imagesplit.image.combined_image</span> <span class="kn">import</span> <span class="n">Axis</span>
+<span class="kn">from</span> <span class="nn">imagesplit.utils.utilities</span> <span class="kn">import</span> <span class="n">compute_bytes_per_voxel</span><span class="p">,</span> \
+    <span class="n">get_numpy_datatype</span>
+
+
+<div class="viewcode-block" id="MetaIoFile"><a class="viewcode-back" href="../../../imagesplit.file.metaio_reader.html#imagesplit.file.metaio_reader.MetaIoFile">[docs]</a><span class="k">class</span> <span class="nc">MetaIoFile</span><span class="p">(</span><span class="n">LinearImageFileReader</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A class for reading or writing 3D imaging data to/from a MetaIO file</span>
+<span class="sd">    pair (.mhd and .raw). &quot;&quot;&quot;</span>
+
+    <span class="c1"># pylint: disable=too-many-instance-attributes</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">local_file_size</span><span class="p">,</span> <span class="n">header_filename</span><span class="p">,</span>
+                 <span class="n">file_handle_factory</span><span class="p">,</span> <span class="n">header_template</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">MetaIoFile</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">local_file_size</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_file_handle_factory</span> <span class="o">=</span> <span class="n">file_handle_factory</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_header_filename</span> <span class="o">=</span> <span class="n">header_filename</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_input_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">header_filename</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_file_wrapper</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_file_streamer</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">header_template</span><span class="p">:</span>
+            <span class="c1"># File is for writing</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_mode</span> <span class="o">=</span> <span class="s1">&#39;wb&#39;</span>
+            <span class="c1"># Force the raw filename to match the header filename</span>
+            <span class="n">base_filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">header_filename</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">header</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">header_template</span><span class="p">)</span>
+            <span class="n">header</span><span class="p">[</span><span class="s1">&#39;ElementDataFile&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">base_filename</span> <span class="o">+</span> <span class="s1">&#39;.raw&#39;</span>
+
+            <span class="n">save_mhd_header</span><span class="p">(</span><span class="n">header_filename</span><span class="p">,</span> <span class="n">header</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_header</span> <span class="o">=</span> <span class="n">header</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># File is for reading</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_mode</span> <span class="o">=</span> <span class="s1">&#39;rb&#39;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_header</span> <span class="o">=</span> <span class="n">load_mhd_header</span><span class="p">(</span><span class="n">header_filename</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_bytes_per_voxel</span> <span class="o">=</span> <span class="n">compute_bytes_per_voxel</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_header</span><span class="p">[</span><span class="s2">&quot;ElementType&quot;</span><span class="p">])</span> <span class="c1"># ToDo: set this based on output format</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_numpy_format</span> <span class="o">=</span> <span class="n">get_numpy_datatype</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_header</span><span class="p">[</span><span class="s2">&quot;ElementType&quot;</span><span class="p">],</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_header</span><span class="p">[</span><span class="s2">&quot;BinaryDataByteOrderMSB&quot;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_subimage_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_header</span><span class="p">[</span><span class="s2">&quot;DimSize&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dimension_ordering</span> <span class="o">=</span> <span class="n">get_condensed_dim_order</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_header</span><span class="p">)</span>
+
+<div class="viewcode-block" id="MetaIoFile.load_and_parse_header"><a class="viewcode-back" href="../../../imagesplit.file.metaio_reader.html#imagesplit.file.metaio_reader.MetaIoFile.load_and_parse_header">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">load_and_parse_header</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Reads a MetaIO header file and parses&quot;&quot;&quot;</span>
+
+        <span class="n">header</span> <span class="o">=</span> <span class="n">load_mhd_header</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">parse_mhd</span><span class="p">(</span><span class="n">header</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MetaIoFile.create_read_file"><a class="viewcode-back" href="../../../imagesplit.file.metaio_reader.html#imagesplit.file.metaio_reader.MetaIoFile.create_read_file">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">create_read_file</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">subimage_descriptor</span><span class="p">,</span> <span class="n">file_handle_factory</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create a MetaIoFile class for writing&quot;&quot;&quot;</span>
+
+        <span class="n">filename</span> <span class="o">=</span> <span class="n">subimage_descriptor</span><span class="o">.</span><span class="n">filename</span>
+        <span class="n">local_file_size</span> <span class="o">=</span> <span class="n">subimage_descriptor</span><span class="o">.</span><span class="n">ranges</span><span class="o">.</span><span class="n">image_size</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">local_file_size</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">file_handle_factory</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MetaIoFile.create_write_file"><a class="viewcode-back" href="../../../imagesplit.file.metaio_reader.html#imagesplit.file.metaio_reader.MetaIoFile.create_write_file">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">create_write_file</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">subimage_descriptor</span><span class="p">,</span> <span class="n">file_handle_factory</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create a MetaIoFile class for this filename and template&quot;&quot;&quot;</span>
+
+        <span class="n">header_template</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_create_meta_header</span><span class="p">(</span><span class="n">subimage_descriptor</span><span class="p">)</span>
+        <span class="c1"># header_template = copy.deepcopy(subimage_descriptor.template)</span>
+        <span class="n">local_file_size</span> <span class="o">=</span> <span class="n">subimage_descriptor</span><span class="o">.</span><span class="n">get_local_size</span><span class="p">()</span>
+        <span class="n">local_origin</span> <span class="o">=</span> <span class="n">subimage_descriptor</span><span class="o">.</span><span class="n">get_local_origin</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">subimage_descriptor</span><span class="o">.</span><span class="n">data_type</span><span class="p">:</span>
+            <span class="n">header_template</span><span class="p">[</span><span class="s2">&quot;ElementType&quot;</span><span class="p">]</span> <span class="o">=</span> \
+                <span class="n">DataType</span><span class="o">.</span><span class="n">metaio_from_name</span><span class="p">(</span><span class="n">subimage_descriptor</span><span class="o">.</span><span class="n">data_type</span><span class="p">)</span>
+        <span class="n">header_template</span><span class="p">[</span><span class="s2">&quot;DimSize&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">local_file_size</span>
+        <span class="n">header_template</span><span class="p">[</span><span class="s2">&quot;Origin&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">local_origin</span>
+        <span class="n">filename</span> <span class="o">=</span> <span class="n">subimage_descriptor</span><span class="o">.</span><span class="n">filename</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">local_file_size</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">file_handle_factory</span><span class="p">,</span>
+                   <span class="n">header_template</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MetaIoFile.close_file"><a class="viewcode-back" href="../../../imagesplit.file.metaio_reader.html#imagesplit.file.metaio_reader.MetaIoFile.close_file">[docs]</a>    <span class="k">def</span> <span class="nf">close_file</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Close file&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="MetaIoFile.write_line"><a class="viewcode-back" href="../../../imagesplit.file.metaio_reader.html#imagesplit.file.metaio_reader.MetaIoFile.write_line">[docs]</a>    <span class="k">def</span> <span class="nf">write_line</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start_coords</span><span class="p">,</span> <span class="n">image_line</span><span class="p">,</span> <span class="n">rescale_limits</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Write consecutive voxels to the raw binary file.&quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_file_streamer</span><span class="p">()</span><span class="o">.</span><span class="n">write_line</span><span class="p">(</span>
+            <span class="n">start_coords</span><span class="p">,</span> <span class="n">image_line</span><span class="p">,</span> <span class="n">rescale_limits</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MetaIoFile.read_line"><a class="viewcode-back" href="../../../imagesplit.file.metaio_reader.html#imagesplit.file.metaio_reader.MetaIoFile.read_line">[docs]</a>    <span class="k">def</span> <span class="nf">read_line</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start_coords</span><span class="p">,</span> <span class="n">num_voxels_to_read</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Read consecutive voxels of image data from the raw binary file</span>
+<span class="sd">        starting at the specified coordinates. &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_file_streamer</span><span class="p">()</span><span class="o">.</span><span class="n">read_line</span><span class="p">(</span><span class="n">start_coords</span><span class="p">,</span>
+                                                   <span class="n">num_voxels_to_read</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MetaIoFile.get_bytes_per_voxel"><a class="viewcode-back" href="../../../imagesplit.file.metaio_reader.html#imagesplit.file.metaio_reader.MetaIoFile.get_bytes_per_voxel">[docs]</a>    <span class="k">def</span> <span class="nf">get_bytes_per_voxel</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the number of bytes used to represent a single voxel in</span>
+<span class="sd">        this image. &quot;&quot;&quot;</span>
+
+        <span class="n">header</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_header</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">compute_bytes_per_voxel</span><span class="p">(</span><span class="n">header</span><span class="p">[</span><span class="s2">&quot;ElementType&quot;</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="MetaIoFile.get_dimension_ordering"><a class="viewcode-back" href="../../../imagesplit.file.metaio_reader.html#imagesplit.file.metaio_reader.MetaIoFile.get_dimension_ordering">[docs]</a>    <span class="k">def</span> <span class="nf">get_dimension_ordering</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the preferred dimension ordering for writing data.</span>
+
+<span class="sd">        Returns an array of 3 element, where each element represents a</span>
+<span class="sd">        dimension in the global coordinate system numbered from 1 to 3 and</span>
+<span class="sd">        is positive if data are to be written in ascending coordinates (in</span>
+<span class="sd">        the global system) or negative if to be written in descending global</span>
+<span class="sd">        coordinates along that dimension</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dimension_ordering</span></div>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_create_meta_header</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">subimage_descriptor</span><span class="p">):</span>
+        <span class="n">local_file_size</span> <span class="o">=</span> <span class="n">subimage_descriptor</span><span class="o">.</span><span class="n">get_local_size</span><span class="p">()</span>
+        <span class="n">local_origin</span> <span class="o">=</span> <span class="n">subimage_descriptor</span><span class="o">.</span><span class="n">get_local_origin</span><span class="p">()</span>
+        <span class="n">local_voxel_size</span> <span class="o">=</span> <span class="n">subimage_descriptor</span><span class="o">.</span><span class="n">get_local_voxel_size</span><span class="p">()</span>
+
+        <span class="n">transform_matrix</span> <span class="o">=</span> <span class="n">condensed_to_cosine</span><span class="p">(</span>
+            <span class="n">subimage_descriptor</span><span class="o">.</span><span class="n">axis</span><span class="o">.</span><span class="n">to_condensed_format</span><span class="p">())</span>
+
+        <span class="n">header</span> <span class="o">=</span> <span class="n">get_default_metadata</span><span class="p">()</span>
+        <span class="n">header</span><span class="p">[</span><span class="s2">&quot;ObjectType&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Image&#39;</span>
+        <span class="n">header</span><span class="p">[</span><span class="s2">&quot;NDims&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">local_file_size</span><span class="p">)</span>
+        <span class="n">header</span><span class="p">[</span><span class="s2">&quot;BinaryData&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;True&#39;</span>
+        <span class="n">header</span><span class="p">[</span><span class="s2">&quot;BinaryDataByteOrderMSB&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">subimage_descriptor</span><span class="o">.</span><span class="n">msb</span>
+        <span class="n">header</span><span class="p">[</span><span class="s2">&quot;CompressedData&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;False&#39;</span>
+        <span class="n">header</span><span class="p">[</span><span class="s2">&quot;TransformMatrix&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">transform_matrix</span>
+        <span class="n">header</span><span class="p">[</span><span class="s2">&quot;ElementSize&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">local_voxel_size</span>
+        <span class="n">header</span><span class="p">[</span><span class="s2">&quot;DimSize&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">local_file_size</span>
+        <span class="n">header</span><span class="p">[</span><span class="s2">&quot;ElementType&quot;</span><span class="p">]</span> <span class="o">=</span> \
+            <span class="n">DataType</span><span class="o">.</span><span class="n">metaio_from_name</span><span class="p">(</span><span class="n">subimage_descriptor</span><span class="o">.</span><span class="n">data_type</span><span class="p">)</span>
+        <span class="n">header</span><span class="p">[</span><span class="s2">&quot;Origin&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">local_origin</span>
+
+        <span class="k">return</span> <span class="n">header</span>
+
+    <span class="k">def</span> <span class="nf">_get_header</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return an OrderedDict containing the MetaIO metaheader metadata</span>
+<span class="sd">        for this image. &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_header</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_header</span> <span class="o">=</span> <span class="n">load_mhd_header</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_header_filename</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_header</span>
+
+    <span class="k">def</span> <span class="nf">_get_file_wrapper</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the FileWrapper representing this image, creating it if</span>
+<span class="sd">        it does not already exist. &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file_wrapper</span><span class="p">:</span>
+            <span class="n">header</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_header</span><span class="p">()</span>
+            <span class="n">filename_raw</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_input_path</span><span class="p">,</span>
+                                        <span class="n">header</span><span class="p">[</span><span class="s2">&quot;ElementDataFile&quot;</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_file_wrapper</span> <span class="o">=</span> <span class="n">FileWrapper</span><span class="p">(</span><span class="n">filename_raw</span><span class="p">,</span>
+                                             <span class="bp">self</span><span class="o">.</span><span class="n">_file_handle_factory</span><span class="p">,</span>
+                                             <span class="bp">self</span><span class="o">.</span><span class="n">_mode</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file_wrapper</span>
+
+    <span class="k">def</span> <span class="nf">_get_file_streamer</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the FileStreamer representing this image, creating it</span>
+<span class="sd">        if it does not already exist. &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file_streamer</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_file_streamer</span> <span class="o">=</span> <span class="n">FileStreamer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_file_wrapper</span><span class="p">(),</span>
+                                               <span class="bp">self</span><span class="o">.</span><span class="n">_subimage_size</span><span class="p">,</span>
+                                               <span class="bp">self</span><span class="o">.</span><span class="n">_bytes_per_voxel</span><span class="p">,</span>
+                                               <span class="bp">self</span><span class="o">.</span><span class="n">_numpy_format</span><span class="p">,</span>
+                                               <span class="bp">self</span><span class="o">.</span><span class="n">_dimension_ordering</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file_streamer</span>
+
+<div class="viewcode-block" id="MetaIoFile.close"><a class="viewcode-back" href="../../../imagesplit.file.metaio_reader.html#imagesplit.file.metaio_reader.MetaIoFile.close">[docs]</a>    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Close the files associated with this image, if they are not</span>
+<span class="sd">        already closed. &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file_streamer</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_file_streamer</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_file_streamer</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file_wrapper</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_file_wrapper</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_file_wrapper</span> <span class="o">=</span> <span class="kc">None</span></div></div>
+
+
+<div class="viewcode-block" id="load_mhd_header"><a class="viewcode-back" href="../../../imagesplit.file.metaio_reader.html#imagesplit.file.metaio_reader.load_mhd_header">[docs]</a><span class="k">def</span> <span class="nf">load_mhd_header</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return an OrderedDict containing metadata loaded from an mhd file.&quot;&quot;&quot;</span>
+
+    <span class="n">metadata</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span> <span class="k">as</span> <span class="n">header_file</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">header_file</span><span class="p">:</span>
+            <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="p">)]</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;ElementSpacing&#39;</span><span class="p">,</span> <span class="s1">&#39;Offset&#39;</span><span class="p">,</span> <span class="s1">&#39;CenterOfRotation&#39;</span><span class="p">,</span>
+                       <span class="s1">&#39;TransformMatrix&#39;</span><span class="p">,</span> <span class="s1">&#39;ElementSize&#39;</span><span class="p">]:</span>
+                <span class="n">new_val</span> <span class="o">=</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">val</span><span class="o">.</span><span class="n">split</span><span class="p">()]</span>
+            <span class="k">elif</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;NDims&#39;</span><span class="p">,</span> <span class="s1">&#39;ElementNumberOfChannels&#39;</span><span class="p">]:</span>
+                <span class="n">new_val</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;DimSize&#39;</span><span class="p">]:</span>
+                <span class="n">new_val</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">val</span><span class="o">.</span><span class="n">split</span><span class="p">()]</span>
+            <span class="k">elif</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;BinaryData&#39;</span><span class="p">,</span> <span class="s1">&#39;BinaryDataByteOrderMSB&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;CompressedData&#39;</span><span class="p">]:</span>
+                <span class="c1"># pylint: disable=simplifiable-if-statement</span>
+                <span class="k">if</span> <span class="n">val</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;true&quot;</span><span class="p">:</span>
+                    <span class="n">new_val</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">new_val</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">new_val</span> <span class="o">=</span> <span class="n">val</span>
+
+            <span class="n">metadata</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_val</span>
+
+    <span class="k">return</span> <span class="n">metadata</span></div>
+
+
+<div class="viewcode-block" id="save_mhd_header"><a class="viewcode-back" href="../../../imagesplit.file.metaio_reader.html#imagesplit.file.metaio_reader.save_mhd_header">[docs]</a><span class="k">def</span> <span class="nf">save_mhd_header</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">metadata</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Saves a mhd header file to disk using the given metadata&quot;&quot;&quot;</span>
+
+    <span class="c1"># Add default metadata, replacing with custom specified values</span>
+    <span class="n">header</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="n">default_metadata</span> <span class="o">=</span> <span class="n">get_default_metadata</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">default_metadata</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">metadata</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">metadata</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">val</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="ow">or</span> <span class="n">value</span> <span class="o">==</span> <span class="s1">&#39;False&#39;</span> <span class="ow">or</span> <span class="n">value</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;[&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;]&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+            <span class="n">header</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> = </span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+    <span class="c1"># Add any custom metadata tags</span>
+    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">metadata</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">default_metadata</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">metadata</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;[&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;]&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+            <span class="n">header</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> = </span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+    <span class="n">file_handle</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
+    <span class="n">file_handle</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">header</span><span class="p">)</span>
+    <span class="n">file_handle</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="get_default_metadata"><a class="viewcode-back" href="../../../imagesplit.file.metaio_reader.html#imagesplit.file.metaio_reader.get_default_metadata">[docs]</a><span class="k">def</span> <span class="nf">get_default_metadata</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Return an OrderedDict containing default mhd file metadata&quot;&quot;&quot;</span>
+
+    <span class="k">return</span> <span class="n">OrderedDict</span><span class="p">(</span>
+        <span class="p">[(</span><span class="s1">&#39;ObjectType&#39;</span><span class="p">,</span> <span class="s1">&#39;Image&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;NDims&#39;</span><span class="p">,</span> <span class="s1">&#39;3&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;BinaryData&#39;</span><span class="p">,</span> <span class="s1">&#39;True&#39;</span><span class="p">),</span>
+         <span class="p">(</span><span class="s1">&#39;BinaryDataByteOrderMSB&#39;</span><span class="p">,</span> <span class="s1">&#39;True&#39;</span><span class="p">),</span>
+         <span class="p">(</span><span class="s1">&#39;CompressedData&#39;</span><span class="p">,</span> <span class="p">[]),</span> <span class="p">(</span><span class="s1">&#39;CompressedDataSize&#39;</span><span class="p">,</span> <span class="p">[]),</span>
+         <span class="p">(</span><span class="s1">&#39;TransformMatrix&#39;</span><span class="p">,</span> <span class="p">[]),</span> <span class="p">(</span><span class="s1">&#39;Offset&#39;</span><span class="p">,</span> <span class="p">[]),</span>
+         <span class="p">(</span><span class="s1">&#39;CenterOfRotation&#39;</span><span class="p">,</span> <span class="p">[]),</span> <span class="p">(</span><span class="s1">&#39;AnatomicalOrientation&#39;</span><span class="p">,</span> <span class="p">[]),</span>
+         <span class="p">(</span><span class="s1">&#39;ElementSpacing&#39;</span><span class="p">,</span> <span class="p">[]),</span> <span class="p">(</span><span class="s1">&#39;DimSize&#39;</span><span class="p">,</span> <span class="p">[]),</span>
+         <span class="p">(</span><span class="s1">&#39;ElementNumberOfChannels&#39;</span><span class="p">,</span> <span class="p">[]),</span> <span class="p">(</span><span class="s1">&#39;ElementSize&#39;</span><span class="p">,</span> <span class="p">[]),</span>
+         <span class="p">(</span><span class="s1">&#39;ElementType&#39;</span><span class="p">,</span> <span class="s1">&#39;MET_FLOAT&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;ElementDataFile&#39;</span><span class="p">,</span> <span class="p">[]),</span>
+         <span class="p">(</span><span class="s1">&#39;Comment&#39;</span><span class="p">,</span> <span class="p">[]),</span> <span class="p">(</span><span class="s1">&#39;SeriesDescription&#39;</span><span class="p">,</span> <span class="p">[]),</span> <span class="p">(</span><span class="s1">&#39;AcquisitionDate&#39;</span><span class="p">,</span> <span class="p">[]),</span>
+         <span class="p">(</span><span class="s1">&#39;AcquisitionTime&#39;</span><span class="p">,</span> <span class="p">[]),</span>
+         <span class="p">(</span><span class="s1">&#39;StudyDate&#39;</span><span class="p">,</span> <span class="p">[]),</span> <span class="p">(</span><span class="s1">&#39;StudyTime&#39;</span><span class="p">,</span> <span class="p">[])])</span></div>
+
+
+<div class="viewcode-block" id="get_condensed_dim_order"><a class="viewcode-back" href="../../../imagesplit.file.metaio_reader.html#imagesplit.file.metaio_reader.get_condensed_dim_order">[docs]</a><span class="k">def</span> <span class="nf">get_condensed_dim_order</span><span class="p">(</span><span class="n">header</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return the condensed dimension order and flip string for this header&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="s2">&quot;TransformMatrix&quot;</span> <span class="ow">in</span> <span class="n">header</span> <span class="ow">and</span> <span class="n">header</span><span class="p">[</span><span class="s2">&quot;TransformMatrix&quot;</span><span class="p">]:</span>
+        <span class="n">transform</span> <span class="o">=</span> <span class="n">header</span><span class="p">[</span><span class="s2">&quot;TransformMatrix&quot;</span><span class="p">]</span>
+        <span class="n">new_dimension_order</span><span class="p">,</span> <span class="n">flip_orientation</span> <span class="o">=</span> \
+            <span class="n">mhd_cosines_to_permutation</span><span class="p">(</span>
+                <span class="n">transform</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">],</span> <span class="n">transform</span><span class="p">[</span><span class="mi">3</span><span class="p">:</span><span class="mi">6</span><span class="p">],</span> <span class="n">transform</span><span class="p">[</span><span class="mi">6</span><span class="p">:</span><span class="mi">9</span><span class="p">])</span>
+    <span class="k">elif</span> <span class="s2">&quot;AnatomicalOrientation&quot;</span> <span class="ow">in</span> <span class="n">header</span> <span class="ow">and</span> <span class="n">header</span><span class="p">[</span><span class="s2">&quot;AnatomicalOrientation&quot;</span><span class="p">]:</span>
+        <span class="n">new_dimension_order</span><span class="p">,</span> <span class="n">flip_orientation</span> <span class="o">=</span> \
+            <span class="n">anatomical_to_permutation</span><span class="p">(</span>
+                <span class="n">header</span><span class="p">[</span><span class="s2">&quot;AnatomicalOrientation&quot;</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">new_dimension_order</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
+        <span class="n">flip_orientation</span> <span class="o">=</span> <span class="p">[</span><span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">Axis</span><span class="p">(</span><span class="n">new_dimension_order</span><span class="p">,</span> <span class="n">flip_orientation</span><span class="p">)</span><span class="o">.</span><span class="n">to_condensed_format</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="anatomical_to_permutation"><a class="viewcode-back" href="../../../imagesplit.file.metaio_reader.html#imagesplit.file.metaio_reader.anatomical_to_permutation">[docs]</a><span class="k">def</span> <span class="nf">anatomical_to_permutation</span><span class="p">(</span><span class="n">anatomical_orientation_string</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Dimension permutation vector corresponding to this orientation string&quot;&quot;&quot;</span>
+
+    <span class="n">direction_cosine_1</span> <span class="o">=</span> \
+        <span class="n">anatomical_to_cosine</span><span class="p">(</span><span class="n">anatomical_orientation_string</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">direction_cosine_2</span> <span class="o">=</span> \
+        <span class="n">anatomical_to_cosine</span><span class="p">(</span><span class="n">anatomical_orientation_string</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">direction_cosine_3</span> <span class="o">=</span> \
+        <span class="n">anatomical_to_cosine</span><span class="p">(</span><span class="n">anatomical_orientation_string</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+
+    <span class="n">permutation_vector</span><span class="p">,</span> <span class="n">flip_orientation</span> <span class="o">=</span> \
+        <span class="n">mhd_cosines_to_permutation</span><span class="p">(</span>
+            <span class="n">direction_cosine_1</span><span class="p">,</span> <span class="n">direction_cosine_2</span><span class="p">,</span> <span class="n">direction_cosine_3</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">permutation_vector</span><span class="p">,</span> <span class="n">flip_orientation</span></div>
+
+
+<div class="viewcode-block" id="anatomical_to_cosine"><a class="viewcode-back" href="../../../imagesplit.file.metaio_reader.html#imagesplit.file.metaio_reader.anatomical_to_cosine">[docs]</a><span class="k">def</span> <span class="nf">anatomical_to_cosine</span><span class="p">(</span><span class="n">anatomical_orientation_char</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get Dicom direction cosine for this orientation string&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">anatomical_orientation_char</span> <span class="o">==</span> <span class="s1">&#39;R&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">anatomical_orientation_char</span> <span class="o">==</span> <span class="s1">&#39;L&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">anatomical_orientation_char</span> <span class="o">==</span> <span class="s1">&#39;A&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">anatomical_orientation_char</span> <span class="o">==</span> <span class="s1">&#39;P&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">anatomical_orientation_char</span> <span class="o">==</span> <span class="s1">&#39;I&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">anatomical_orientation_char</span> <span class="o">==</span> <span class="s1">&#39;S&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;No implementation yet for anatomical orientation &#39;</span> <span class="o">+</span>
+                     <span class="n">anatomical_orientation_char</span> <span class="o">+</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="permutation_to_cosine"><a class="viewcode-back" href="../../../imagesplit.file.metaio_reader.html#imagesplit.file.metaio_reader.permutation_to_cosine">[docs]</a><span class="k">def</span> <span class="nf">permutation_to_cosine</span><span class="p">(</span><span class="n">permutation</span><span class="p">,</span> <span class="n">flip</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get mhd direction cosine for this dimension permutation&quot;&quot;&quot;</span>
+
+    <span class="n">dir_cosine</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">dir_cosine</span><span class="p">[</span><span class="n">permutation</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span> <span class="k">if</span> <span class="n">flip</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">else</span> <span class="mi">1</span>
+    <span class="n">dir_cosine</span><span class="p">[</span><span class="n">permutation</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="mi">3</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span> <span class="k">if</span> <span class="n">flip</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">else</span> <span class="mi">1</span>
+    <span class="n">dir_cosine</span><span class="p">[</span><span class="n">permutation</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">*</span><span class="mi">3</span> <span class="o">+</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span> <span class="k">if</span> <span class="n">flip</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="k">else</span> <span class="mi">1</span>
+
+    <span class="k">return</span> <span class="n">dir_cosine</span></div>
+
+
+<div class="viewcode-block" id="condensed_to_cosine"><a class="viewcode-back" href="../../../imagesplit.file.metaio_reader.html#imagesplit.file.metaio_reader.condensed_to_cosine">[docs]</a><span class="k">def</span> <span class="nf">condensed_to_cosine</span><span class="p">(</span><span class="n">condensed_format</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get mhd direction cosine for this condensed format axis&quot;&quot;&quot;</span>
+
+    <span class="n">axis</span> <span class="o">=</span> <span class="n">Axis</span><span class="o">.</span><span class="n">from_condensed_format</span><span class="p">(</span><span class="n">condensed_format</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">permutation_to_cosine</span><span class="p">(</span><span class="n">axis</span><span class="o">.</span><span class="n">dim_order</span><span class="p">,</span> <span class="n">axis</span><span class="o">.</span><span class="n">dim_flip</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="mhd_cosines_to_permutation"><a class="viewcode-back" href="../../../imagesplit.file.metaio_reader.html#imagesplit.file.metaio_reader.mhd_cosines_to_permutation">[docs]</a><span class="k">def</span> <span class="nf">mhd_cosines_to_permutation</span><span class="p">(</span><span class="n">direction_cosine_1</span><span class="p">,</span>
+                               <span class="n">direction_cosine_2</span><span class="p">,</span>
+                               <span class="n">direction_cosine_3</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get dimension permutation vectors for these mhd direction cosines&quot;&quot;&quot;</span>
+    <span class="n">orientation_1</span> <span class="o">=</span> <span class="n">direction_cosine_1</span>
+    <span class="n">orientation_2</span> <span class="o">=</span> <span class="n">direction_cosine_2</span>
+    <span class="n">orientation_3</span> <span class="o">=</span> <span class="n">direction_cosine_3</span>
+
+    <span class="n">permutation_vector</span><span class="p">,</span> <span class="n">dimension_1</span><span class="p">,</span> <span class="n">dimension_2</span><span class="p">,</span> <span class="n">dimension_3</span> <span class="o">=</span> \
+        <span class="n">permutation_from_orientations</span><span class="p">(</span><span class="n">orientation_1</span><span class="p">,</span> <span class="n">orientation_2</span><span class="p">)</span>
+
+    <span class="n">flip_orientation</span> <span class="o">=</span> <span class="n">get_flip_from_orientations</span><span class="p">(</span>
+        <span class="n">orientation_1</span><span class="p">,</span> <span class="n">orientation_2</span><span class="p">,</span> <span class="n">orientation_3</span><span class="p">,</span> <span class="n">dimension_1</span><span class="p">,</span> <span class="n">dimension_2</span><span class="p">,</span>
+        <span class="n">dimension_3</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">equal</span><span class="p">(</span><span class="n">permutation_vector</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span> <span class="o">!=</span> <span class="mi">1</span> <span class="ow">or</span> \
+            <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">equal</span><span class="p">(</span><span class="n">permutation_vector</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span> <span class="o">!=</span> <span class="mi">1</span> <span class="ow">or</span> \
+            <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">equal</span><span class="p">(</span><span class="n">permutation_vector</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span> <span class="o">!=</span> <span class="mi">1</span> <span class="ow">or</span> \
+            <span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">setdiff1d</span><span class="p">(</span><span class="n">permutation_vector</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]))</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid permutation vector&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">permutation_vector</span><span class="p">,</span> <span class="n">flip_orientation</span></div>
+
+
+<div class="viewcode-block" id="permutation_from_orientations"><a class="viewcode-back" href="../../../imagesplit.file.metaio_reader.html#imagesplit.file.metaio_reader.permutation_from_orientations">[docs]</a><span class="k">def</span> <span class="nf">permutation_from_orientations</span><span class="p">(</span><span class="n">orientation_1</span><span class="p">,</span> <span class="n">orientation_2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get dimension permutation vectors for these orientation vectors&quot;&quot;&quot;</span>
+    <span class="n">dimension_1</span><span class="p">,</span> <span class="n">dimension_2</span><span class="p">,</span> <span class="n">dimension_3</span> <span class="o">=</span> \
+        <span class="n">dimensions_from_orientations</span><span class="p">(</span><span class="n">orientation_1</span><span class="p">,</span> <span class="n">orientation_2</span><span class="p">)</span>
+
+    <span class="n">permutation_vector</span> <span class="o">=</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
+    <span class="n">permutation_vector</span><span class="p">[</span><span class="n">dimension_1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">permutation_vector</span><span class="p">[</span><span class="n">dimension_2</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">permutation_vector</span><span class="p">,</span> <span class="n">dimension_1</span><span class="p">,</span> <span class="n">dimension_2</span><span class="p">,</span> <span class="n">dimension_3</span></div>
+
+
+<div class="viewcode-block" id="dimensions_from_orientations"><a class="viewcode-back" href="../../../imagesplit.file.metaio_reader.html#imagesplit.file.metaio_reader.dimensions_from_orientations">[docs]</a><span class="k">def</span> <span class="nf">dimensions_from_orientations</span><span class="p">(</span><span class="n">orientation_vector_1</span><span class="p">,</span>
+                                 <span class="n">orientation_vector_2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get dimension permutation vectors for these orientation vectors&quot;&quot;&quot;</span>
+
+    <span class="n">dimension_number_1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">orientation_vector_1</span><span class="p">))</span>
+    <span class="n">remaining_dimensions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">setdiff1d</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="n">dimension_number_1</span><span class="p">)</span>
+    <span class="n">reduced_orientation_vector_2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">take</span><span class="p">(</span><span class="n">orientation_vector_2</span><span class="p">,</span>
+                                           <span class="n">remaining_dimensions</span><span class="p">)</span>
+    <span class="n">dim2_from_reduced_set</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">reduced_orientation_vector_2</span><span class="p">))</span>
+    <span class="n">dimension_number_2</span> <span class="o">=</span> <span class="n">remaining_dimensions</span><span class="p">[</span><span class="n">dim2_from_reduced_set</span><span class="p">]</span>
+    <span class="n">dimension_number_3</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">setdiff1d</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>
+                                      <span class="p">[</span><span class="n">dimension_number_1</span><span class="p">,</span> <span class="n">dimension_number_2</span><span class="p">])</span>
+    <span class="n">dimension_number_3</span> <span class="o">=</span> <span class="n">dimension_number_3</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">dimension_number_1</span><span class="p">,</span> <span class="n">dimension_number_2</span><span class="p">,</span> <span class="n">dimension_number_3</span></div>
+
+
+<div class="viewcode-block" id="get_flip_from_orientations"><a class="viewcode-back" href="../../../imagesplit.file.metaio_reader.html#imagesplit.file.metaio_reader.get_flip_from_orientations">[docs]</a><span class="k">def</span> <span class="nf">get_flip_from_orientations</span><span class="p">(</span><span class="n">orientation_1</span><span class="p">,</span> <span class="n">orientation_2</span><span class="p">,</span> <span class="n">orientation_3</span><span class="p">,</span>
+                               <span class="n">dimension_1</span><span class="p">,</span> <span class="n">dimension_2</span><span class="p">,</span> <span class="n">dimension_3</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get dimension flip vectors for these orientation vectors&quot;&quot;&quot;</span>
+
+    <span class="n">flip</span> <span class="o">=</span> <span class="p">[</span><span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">]</span>
+    <span class="n">flip</span><span class="p">[</span><span class="n">dimension_1</span><span class="p">]</span> <span class="o">=</span> <span class="n">orientation_1</span><span class="p">[</span><span class="n">dimension_1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">0</span>
+    <span class="n">flip</span><span class="p">[</span><span class="n">dimension_2</span><span class="p">]</span> <span class="o">=</span> <span class="n">orientation_2</span><span class="p">[</span><span class="n">dimension_2</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">0</span>
+    <span class="n">flip</span><span class="p">[</span><span class="n">dimension_3</span><span class="p">]</span> <span class="o">=</span> <span class="n">orientation_3</span><span class="p">[</span><span class="n">dimension_3</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">0</span>
+    <span class="k">return</span> <span class="n">flip</span></div>
+
+
+<div class="viewcode-block" id="parse_mhd"><a class="viewcode-back" href="../../../imagesplit.file.metaio_reader.html#imagesplit.file.metaio_reader.parse_mhd">[docs]</a><span class="k">def</span> <span class="nf">parse_mhd</span><span class="p">(</span><span class="n">header</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Read a metaheader and returns a FileImageDescriptor&quot;&quot;&quot;</span>
+
+    <span class="n">file_format</span> <span class="o">=</span> <span class="s2">&quot;mhd&quot;</span>
+    <span class="n">dim_order</span> <span class="o">=</span> <span class="n">get_condensed_dim_order</span><span class="p">(</span><span class="n">header</span><span class="p">)</span>
+    <span class="n">data_type</span> <span class="o">=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">name_from_metaio</span><span class="p">(</span><span class="n">header</span><span class="p">[</span><span class="s2">&quot;ElementType&quot;</span><span class="p">])</span>
+    <span class="n">image_size</span> <span class="o">=</span> <span class="n">header</span><span class="p">[</span><span class="s2">&quot;DimSize&quot;</span><span class="p">]</span>
+    <span class="n">msb</span> <span class="o">=</span> <span class="n">header</span><span class="p">[</span><span class="s2">&quot;BinaryDataByteOrderMSB&quot;</span><span class="p">]</span>
+    <span class="n">compression</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">voxel_size</span> <span class="o">=</span> <span class="n">header</span><span class="p">[</span><span class="s1">&#39;ElementSize&#39;</span><span class="p">]</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">FileImageDescriptor</span><span class="p">(</span><span class="n">file_format</span><span class="o">=</span><span class="n">file_format</span><span class="p">,</span>
+                                <span class="n">dim_order</span><span class="o">=</span><span class="n">dim_order</span><span class="p">,</span>
+                                <span class="n">data_type</span><span class="o">=</span><span class="n">data_type</span><span class="p">,</span>
+                                <span class="n">image_size</span><span class="o">=</span><span class="n">image_size</span><span class="p">,</span>
+                                <span class="n">msb</span><span class="o">=</span><span class="n">msb</span><span class="p">,</span>
+                                <span class="n">compression</span><span class="o">=</span><span class="n">compression</span><span class="p">,</span>
+                                <span class="n">voxel_size</span><span class="o">=</span><span class="n">voxel_size</span><span class="p">),</span> <span class="n">header</span><span class="p">)</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../../index.html">
+              <img class="logo" src="../../../_static/giftsurg-icon.png" alt="Logo"/>
+            </a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">ImageSplit  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">imagesplit.file.metaio_reader</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, UCL.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.5.1.
+    </div>
+  </body>
+</html>

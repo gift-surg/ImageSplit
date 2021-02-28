@@ -1,0 +1,262 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>imagesplit.image.image_wrapper module &#8212; ImageSplit  documentation</title>
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">ImageSplit  documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">imagesplit.image.image_wrapper module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-imagesplit.image.image_wrapper">
+<span id="imagesplit-image-image-wrapper-module"></span><h1>imagesplit.image.image_wrapper module<a class="headerlink" href="#module-imagesplit.image.image_wrapper" title="Permalink to this headline">¶</a></h1>
+<p>A wrapper for a multi-dimensional image with an origin offset</p>
+<dl class="py class">
+<dt id="imagesplit.image.image_wrapper.ImageStorage">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">imagesplit.image.image_wrapper.</span></code><code class="sig-name descname"><span class="pre">ImageStorage</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">numpy_image</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/image/image_wrapper.html#ImageStorage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.image.image_wrapper.ImageStorage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Abstraction for storing image data in an arbitrary orientation</p>
+<p>Allows storing of data without assuming the order in which the dimensions
+are stored in memory or indexed. This allows images to be indexed using
+the [x,y,z] convention while the numpy ordering is actually [z,y,x]</p>
+<dl class="py method">
+<dt id="imagesplit.image.image_wrapper.ImageStorage.copy">
+<code class="sig-name descname"><span class="pre">copy</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/image/image_wrapper.html#ImageStorage.copy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.image.image_wrapper.ImageStorage.copy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a new object with a copy of the underlying data</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="imagesplit.image.image_wrapper.ImageStorage.create_empty">
+<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">create_empty</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/image/image_wrapper.html#ImageStorage.create_empty"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.image.image_wrapper.ImageStorage.create_empty" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create empty object of the specified global size and data type</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="imagesplit.image.image_wrapper.ImageStorage.flip">
+<code class="sig-name descname"><span class="pre">flip</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">do_flip</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/image/image_wrapper.html#ImageStorage.flip"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.image.image_wrapper.ImageStorage.flip" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a copy of image data flipped using global ordering</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="imagesplit.image.image_wrapper.ImageStorage.from_raw_image">
+<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">from_raw_image</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">raw</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/image/image_wrapper.html#ImageStorage.from_raw_image"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.image.image_wrapper.ImageStorage.from_raw_image" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create ImageStorage object from this image data array</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="imagesplit.image.image_wrapper.ImageStorage.get">
+<code class="sig-name descname"><span class="pre">get</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">selector</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/image/image_wrapper.html#ImageStorage.get"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.image.image_wrapper.ImageStorage.get" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns part of the image data using the specified selectors</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="imagesplit.image.image_wrapper.ImageStorage.get_image">
+<code class="sig-name descname"><span class="pre">get_image</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/image/image_wrapper.html#ImageStorage.get_image"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.image.image_wrapper.ImageStorage.get_image" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates and returns an Image object for this data</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="imagesplit.image.image_wrapper.ImageStorage.get_raw">
+<code class="sig-name descname"><span class="pre">get_raw</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/image/image_wrapper.html#ImageStorage.get_raw"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.image.image_wrapper.ImageStorage.get_raw" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return raw image array; might not be in global dimension ordering</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="imagesplit.image.image_wrapper.ImageStorage.get_raw_image">
+<code class="sig-name descname"><span class="pre">get_raw_image</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/image/image_wrapper.html#ImageStorage.get_raw_image"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.image.image_wrapper.ImageStorage.get_raw_image" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return raw image array in the standard PIL dimension ordering</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="imagesplit.image.image_wrapper.ImageStorage.get_size">
+<code class="sig-name descname"><span class="pre">get_size</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/image/image_wrapper.html#ImageStorage.get_size"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.image.image_wrapper.ImageStorage.get_size" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the image size in the global dimension ordering scheme</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="imagesplit.image.image_wrapper.ImageStorage.get_type">
+<code class="sig-name descname"><span class="pre">get_type</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/image/image_wrapper.html#ImageStorage.get_type"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.image.image_wrapper.ImageStorage.get_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the underlying data type</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="imagesplit.image.image_wrapper.ImageStorage.reshape">
+<code class="sig-name descname"><span class="pre">reshape</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_shape</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/image/image_wrapper.html#ImageStorage.reshape"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.image.image_wrapper.ImageStorage.reshape" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a reshaping of the image data using global ordering</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="imagesplit.image.image_wrapper.ImageStorage.set">
+<code class="sig-name descname"><span class="pre">set</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">selector</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/image/image_wrapper.html#ImageStorage.set"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.image.image_wrapper.ImageStorage.set" title="Permalink to this definition">¶</a></dt>
+<dd><p>Replaces part of the image data using the specified selectors</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="imagesplit.image.image_wrapper.ImageStorage.transpose">
+<code class="sig-name descname"><span class="pre">transpose</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">order</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/image/image_wrapper.html#ImageStorage.transpose"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.image.image_wrapper.ImageStorage.transpose" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a transpose of the image data using global ordering</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="imagesplit.image.image_wrapper.ImageWrapper">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">imagesplit.image.image_wrapper.</span></code><code class="sig-name descname"><span class="pre">ImageWrapper</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">origin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/image/image_wrapper.html#ImageWrapper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.image.image_wrapper.ImageWrapper" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#imagesplit.image.image_wrapper.ImageWrapperBase" title="imagesplit.image.image_wrapper.ImageWrapperBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">imagesplit.image.image_wrapper.ImageWrapperBase</span></code></a></p>
+<p>Multi-dimensional image array with an origin</p>
+<dl class="py method">
+<dt id="imagesplit.image.image_wrapper.ImageWrapper.get_sub_image">
+<code class="sig-name descname"><span class="pre">get_sub_image</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/image/image_wrapper.html#ImageWrapper.get_sub_image"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.image.image_wrapper.ImageWrapper.get_sub_image" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the corresponding subimage</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="imagesplit.image.image_wrapper.ImageWrapper.transform_coords">
+<code class="sig-name descname"><span class="pre">transform_coords</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sub_image</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/image/image_wrapper.html#ImageWrapper.transform_coords"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.image.image_wrapper.ImageWrapper.transform_coords" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transforms sub_image start, size to this coordinate system</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="imagesplit.image.image_wrapper.ImageWrapper.transform_sub_image">
+<code class="sig-name descname"><span class="pre">transform_sub_image</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sub_image</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/image/image_wrapper.html#ImageWrapper.transform_sub_image"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.image.image_wrapper.ImageWrapper.transform_sub_image" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transforms sub_image to this coordinate system</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="imagesplit.image.image_wrapper.ImageWrapperBase">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">imagesplit.image.image_wrapper.</span></code><code class="sig-name descname"><span class="pre">ImageWrapperBase</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">origin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/image/image_wrapper.html#ImageWrapperBase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.image.image_wrapper.ImageWrapperBase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Multi-dimensional image array with an origin</p>
+<dl class="py method">
+<dt id="imagesplit.image.image_wrapper.ImageWrapperBase.set_sub_image">
+<code class="sig-name descname"><span class="pre">set_sub_image</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sub_image</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/image/image_wrapper.html#ImageWrapperBase.set_sub_image"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.image.image_wrapper.ImageWrapperBase.set_sub_image" title="Permalink to this definition">¶</a></dt>
+<dd><p>Replaces part of the image with the corresponding subimage</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="imagesplit.image.image_wrapper.ImageWrapperBase.transform_coords">
+<em class="property"><span class="pre">abstract</span> </em><code class="sig-name descname"><span class="pre">transform_coords</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sub_image</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/image/image_wrapper.html#ImageWrapperBase.transform_coords"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.image.image_wrapper.ImageWrapperBase.transform_coords" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transforms sub_image start, size to this coordinate system</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="imagesplit.image.image_wrapper.ImageWrapperBase.transform_sub_image">
+<em class="property"><span class="pre">abstract</span> </em><code class="sig-name descname"><span class="pre">transform_sub_image</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sub_image</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/image/image_wrapper.html#ImageWrapperBase.transform_sub_image"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.image.image_wrapper.ImageWrapperBase.transform_sub_image" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transforms sub_image to this coordinate system</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="imagesplit.image.image_wrapper.SmartImage">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">imagesplit.image.image_wrapper.</span></code><code class="sig-name descname"><span class="pre">SmartImage</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transformer</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/image/image_wrapper.html#SmartImage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.image.image_wrapper.SmartImage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#imagesplit.image.image_wrapper.ImageWrapper" title="imagesplit.image.image_wrapper.ImageWrapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">imagesplit.image.image_wrapper.ImageWrapper</span></code></a></p>
+<p>Image wrapper which converts between Axes</p>
+<dl class="py method">
+<dt id="imagesplit.image.image_wrapper.SmartImage.coords_to_other">
+<code class="sig-name descname"><span class="pre">coords_to_other</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">transformer</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/image/image_wrapper.html#SmartImage.coords_to_other"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.image.image_wrapper.SmartImage.coords_to_other" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts coordinates to another system</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="imagesplit.image.image_wrapper.SmartImage.transform_coords">
+<code class="sig-name descname"><span class="pre">transform_coords</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sub_image</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/image/image_wrapper.html#SmartImage.transform_coords"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.image.image_wrapper.SmartImage.transform_coords" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transforms sub_image start, size to this coordinate system</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="imagesplit.image.image_wrapper.SmartImage.transform_sub_image">
+<code class="sig-name descname"><span class="pre">transform_sub_image</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sub_image</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/image/image_wrapper.html#SmartImage.transform_sub_image"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.image.image_wrapper.SmartImage.transform_sub_image" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transforms sub_image to this coordinate system</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="imagesplit.image.image_wrapper.SmartImage.transform_to_other">
+<code class="sig-name descname"><span class="pre">transform_to_other</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">transformer</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/image/image_wrapper.html#SmartImage.transform_to_other"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.image.image_wrapper.SmartImage.transform_to_other" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns this image transformed to a different local system</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/giftsurg-icon.png" alt="Logo"/>
+            </a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/imagesplit.image.image_wrapper.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">ImageSplit  documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">imagesplit.image.image_wrapper module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, UCL.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.5.1.
+    </div>
+  </body>
+</html>

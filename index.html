@@ -1,0 +1,299 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ImageSplit &#8212; ImageSplit  documentation</title>
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="#">ImageSplit  documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">ImageSplit</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="imagesplit">
+<h1>ImageSplit<a class="headerlink" href="#imagesplit" title="Permalink to this headline">¶</a></h1>
+<a class="reference external image-reference" href="https://cmiclab.cs.ucl.ac.uk/GIFT-Surg/ImageSplit/commits/master"><img alt="GitLab-CI test status" src="https://cmiclab.cs.ucl.ac.uk/GIFT-Surg/ImageSplit/badges/master/build.svg" /></a>
+<a class="reference external image-reference" href="https://travis-ci.org/tomdoel/ImageSplit"><img alt="Travis test status" src="https://travis-ci.org/tomdoel/ImageSplit.svg?branch=master" /></a>
+<a class="reference external image-reference" href="https://cmiclab.cs.ucl.ac.uk/GIFT-Surg/ImageSplit/commits/master"><img alt="Test coverage" src="https://cmiclab.cs.ucl.ac.uk/GIFT-Surg/ImageSplit/badges/master/coverage.svg" /></a>
+<a class="reference external image-reference" href="http://imagesplit.readthedocs.io/en/latest/?badge=latest"><img alt="Documentation Status" src="https://readthedocs.org/projects/imagesplit/badge/?version=latest" /></a>
+<p>ImageSplit is a utility for splitting very large image volumes into slices or multiple overlapping sub-volumes, and for recombining sub-volumes into a one or more volumes. ImageSplit can also convert the underlying data types.</p>
+<p>ImageSplit was originally developed to process medical image volumes. As such it mostly supports MetaIO (.mhd/.mha) files at present. There is some limited ability to read .vge image volumes and to read/write monochrome TIFF files.</p>
+<p>Note that many TIFF viewers do not support the full range of datatypes that can be written out by ImageSplit. If can you cannot view output TIFFs, try using a different TIFF Viewer such as ImageJ.</p>
+<p>ImageSplit is designed to prioritise low memory usage over performance, so that large volumes can be easily processed with limited memory resources.</p>
+<p>Author: Tom Doel</p>
+<div class="section" id="installing">
+<h2>Installing<a class="headerlink" href="#installing" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">imagesplit</span>
+</pre></div>
+</div>
+<dl class="simple">
+<dt>Notes:</dt><dd><ul class="simple">
+<li><p>We recommend you use pip to install ImageSplit.</p></li>
+<li><p>Ensure you have Python 2.7 or 3.5 or later installed</p></li>
+<li><p>(especially for macOS users): we suggest you do not modify the system installation of Python 2.7. Instead install a separate version of Python for development purposes (for example, using Homebrew), or use <cite>virtualenv</cite> to create a python virtual environment which you can safely modify without affecting the system installation.</p></li>
+<li><p>If you have Python 2 and Python 3 insatlled, <cite>pip2</cite> may map to Python 2 and <cite>pip3</cite> may map to Python 3. This will depend on your installation</p></li>
+<li><p>If you get permission errors when using <cite>pip</cite>, you may be trying to modify the system Python installation. This is not recommended. Instead install a local version of Python for development, or use a virtual environment (<cite>virtualenv</cite>).</p></li>
+</ul>
+</dd>
+</dl>
+</div>
+<div class="section" id="example-usage">
+<h2>Example usage<a class="headerlink" href="#example-usage" title="Permalink to this headline">¶</a></h2>
+<p>Please see detailed usage below.</p>
+<p>Here is an example which splits files:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">imagesplit</span> <span class="o">--</span><span class="nb">input</span> <span class="n">input_data</span><span class="o">/</span><span class="n">image</span><span class="o">.</span><span class="n">vge</span> <span class="o">--</span><span class="n">out</span> <span class="n">output_data</span><span class="o">/</span><span class="n">split_image</span> <span class="o">-</span><span class="n">s</span> <span class="n">c</span> <span class="o">--</span><span class="nb">format</span> <span class="n">tiff</span> <span class="o">-</span><span class="n">z</span> <span class="o">--</span><span class="n">rescale</span> <span class="o">-</span><span class="mi">50</span> <span class="mi">350</span> <span class="o">--</span><span class="nb">type</span> <span class="n">uchar</span>
+</pre></div>
+</div>
+<dl class="simple">
+<dt>This command will:</dt><dd><ul class="simple">
+<li><p>split the volume file with header <cite>input_data/image.vge</cite></p></li>
+<li><p>into coronal slices (<cite>-s c</cite>)</p></li>
+<li><p>saving them in the <cite>output_data</cite> folder with the filenames <cite>split_image_0000.tiff</cite>, <cite>split_image_0001.tiff</cite> etc</p></li>
+<li><p>The file format is tiff (<cite>–format tiff</cite>)</p></li>
+<li><p>with default compression (<cite>-z</cite>)</p></li>
+<li><p>and data type unsigned char (<cite>–type uchar</cite>)</p></li>
+<li><p>The data will be normalised (rescaled) between minimum and maximum values <cite>-50</cite> and <cite>350</cite> (<cite>–rescale -50 350</cite>)</p></li>
+</ul>
+</dd>
+</dl>
+<p>Here is an example which combines files which are derived from files produced by a previous splitting:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">imagesplit</span> <span class="o">--</span><span class="nb">input</span> <span class="n">input_data</span><span class="o">/</span><span class="n">split_mask</span><span class="o">.</span><span class="n">mhd</span> <span class="o">--</span><span class="n">out</span> <span class="n">output_data</span><span class="o">/</span><span class="n">combined_image</span> <span class="o">--</span><span class="nb">format</span> <span class="n">mhd</span> <span class="o">--</span><span class="n">descriptor</span> <span class="n">output_data</span><span class="o">/</span><span class="n">split_image__info</span><span class="o">.</span><span class="n">imagesplit</span>
+</pre></div>
+</div>
+<dl class="simple">
+<dt>This command will:</dt><dd><ul class="simple">
+<li><p>Combine multiple images in the folder <cite>input_data/split_mask_*.mhd</cite> into a single output file output_data/combined_image.mhd</p></li>
+<li><p>The splitting of the input files is determined from the descriptor file <cite>output_data/split_image__info.imagesplit</cite> generated by a previous splitting command</p></li>
+<li><p>If you are recombining the files that were originally split, you don’t need to specify <cite>–input</cite>. If however you are combining files that are not the ones that were originally split, but which are derived from those, then specify <cite>–input</cite> will modify the filenames in the descriptor to match the input files.
+For example, if you split an image file into multiple subimages, and then compute a mask from each subimage, you can use the original descriptor file to assemble the masks into a combined mask volume. The descriptor is the one from the splitting, but the input filename points to the mask files to combine. The descriptor file will be loaded but the filenames modified to match the mask filenames.</p></li>
+</ul>
+</dd>
+</dl>
+</div>
+<div class="section" id="detailed-usage">
+<h2>Detailed Usage<a class="headerlink" href="#detailed-usage" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">imagesplit</span><span class="o">.</span><span class="n">py</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="o">-</span><span class="n">i</span> <span class="n">INPUT</span> <span class="p">[</span><span class="o">-</span><span class="n">o</span> <span class="n">OUT</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">l</span> <span class="n">OVERLAP</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">m</span> <span class="n">MAX</span> <span class="p">[</span><span class="n">MAX</span> <span class="o">...</span><span class="p">]]</span> <span class="p">[</span><span class="o">-</span><span class="n">x</span> <span class="n">STARTINDEX</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">t</span> <span class="n">TYPE</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">f</span> <span class="n">FORMAT</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">r</span> <span class="p">[</span><span class="n">RESCALE</span> <span class="p">[</span><span class="n">RESCALE</span> <span class="o">...</span><span class="p">]]]</span> <span class="p">[</span><span class="o">-</span><span class="n">z</span> <span class="p">[</span><span class="n">COMPRESS</span><span class="p">]]</span> <span class="p">[</span><span class="o">-</span><span class="n">s</span> <span class="n">SLICE</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">a</span> <span class="n">AXIS</span> <span class="p">[</span><span class="n">AXIS</span> <span class="o">...</span><span class="p">]]</span> <span class="p">[</span><span class="o">-</span><span class="n">d</span> <span class="n">DESCRIPTOR</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">test</span><span class="p">]</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">warning</dt>
+<dd class="field-odd"><p>ImageSplit will overwrite existing output files. Make sure you have your images backed up before you use this utility, to prevent accidental data loss.</p>
+</dd>
+</dl>
+<p>Arguments:</p>
+<p>Input and output filenames:</p>
+<blockquote>
+<div><dl class="option-list">
+<dt><kbd><span class="option">-i <var>INPUT</var></span>, <span class="option">--input <var>INPUT</var></span></kbd></dt>
+<dd><p>Name of input file, or filename prefix for a set of files. If you are combining multiple files using a descriptor, with filenames of the form <cite>*_0001.mhd</cite>, be sure to omit the <cite>*_0001</cite> from the input filename, as it will be appended automatically.</p>
+</dd>
+<dt><kbd><span class="option">-o <var>OUT</var></span>, <span class="option">--out <var>OUT</var></span></kbd></dt>
+<dd><p>Name of output file, or filename prefix if more than one file is output</p>
+</dd>
+<dt><kbd><span class="option">-x <var>STARTINDEX</var></span>, <span class="option">--startindex <var>STARTINDEX</var></span></kbd></dt>
+<dd><p>Start index for filename suffix when loading or saving
+a sequence of files</p>
+</dd>
+<dt><kbd><span class="option">-d <var>DESCRIPTOR</var></span></kbd></dt>
+<dd><p>Specifies that the input files should be assembled using the file DESCRIPTOR as a guide. The DESCRIPTOR file (.imagesplit) is generated from a previous splitting, and stores file offsets which allow you to assemble subvolumes back into a volume.
+The filenames in the DESCRIPTOR file will be overridden by the specified INPUT file name.
+This allows you to combine files according to a template generated from a different file splitting.</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>Specify how to split the image:</p>
+<blockquote>
+<div><dl class="option-list">
+<dt><kbd><span class="option">-l <var>OVERLAP</var></span>, <span class="option">--overlap <var>OVERLAP</var></span></kbd></dt>
+<dd><p>Number of voxels to overlap between output images. If
+not specified, output images will not overlap</p>
+</dd>
+<dt><kbd><span class="option">-m <var>MAX</var></span>, <span class="option">--max <var>MAX</var></span></kbd></dt>
+<dd><p>Maximum number of voxels in each dimension in each
+output file. MAX can be a scalar or vector corresponding
+to each image dimension. The file will be optimally
+split such that each file output dimension is less
+than or equal to this maximum.</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>Specify file format, data type, and whether data should be rescaled (normalised):</p>
+<blockquote>
+<div><dl class="option-list">
+<dt><kbd><span class="option">-t <var>TYPE</var></span>, <span class="option">--type <var>TYPE</var></span></kbd></dt>
+<dd><p>Output data type (default: same as input file datatype)</p>
+</dd>
+<dt><kbd><span class="option">-f <var>FORMAT</var></span>, <span class="option">--format <var>FORMAT</var></span></kbd></dt>
+<dd><p>Output file format such as mhd, tiff (default: same as input file format)</p>
+</dd>
+<dt><kbd><span class="option">-r <var>RESCALE</var></span>, <span class="option">--rescale <var>RESCALE</var></span></kbd></dt>
+<dd><p>Rescale image between the specified min and max
+values. If no RESCALE values are specified, use the volume limits.</p>
+</dd>
+<dt><kbd><span class="option">-z <var>COMPRESS</var></span>, <span class="option">--compress <var>COMPRESS</var></span></kbd></dt>
+<dd><p>Enables compression (default if -Z not specified: no compression). Valid
+values depend on the output file format. -z with no
+COMPRESS argument will choose a suitable compression for
+this file format. For TIFF files, the default is Adboe
+deflat and other valid values are those supported by PIL.</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>Specify output orientation:</p>
+<blockquote>
+<div><dl class="option-list">
+<dt><kbd><span class="option">-s <var>SLICE</var></span>, <span class="option">--slice <var>SLICE</var></span></kbd></dt>
+<dd><p>Divide image into slices along the specified axis.
+Choose 1, 2, 3 etc to select an axis relative to the
+current image orientation, or c, s, a to select an
+absolute orientation.This argument cannot be used with –axis, –max or –overlap.</p>
+</dd>
+<dt><kbd><span class="option">-a <var>AXIS</var></span>, <span class="option">--axis <var>AXIS</var></span></kbd></dt>
+<dd><p>Axis ordering (default 1 2 3). Specifies the global
+axis corresponding to each dimension in the image
+file. The first value is the global axis represented
+by the first dimension in the file, and so on. One
+value for each dimension, dimensions are numbered
+1,2,3,… and a negative value means that axis is
+flipped. This cannot be used with –slice</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>Help and testing:</p>
+<blockquote>
+<div><dl class="option-list">
+<dt><kbd><span class="option">--test</span></kbd></dt>
+<dd><p>If set, no writing will be performed to the output files</p>
+</dd>
+<dt><kbd><span class="option">-h</span>, <span class="option">--help</span></kbd></dt>
+<dd><p>Show this help message and exit</p>
+</dd>
+</dl>
+</div></blockquote>
+<div class="section" id="contributing">
+<h3>Contributing<a class="headerlink" href="#contributing" title="Permalink to this headline">¶</a></h3>
+<p>Please see the <a class="reference external" href="https://cmiclab.cs.ucl.ac.uk/GIFT-Surg/ImageSplit/blob/master/CONTRIBUTING.rst">contributing guidelines</a>.</p>
+</div>
+<div class="section" id="useful-links">
+<h3>Useful links<a class="headerlink" href="#useful-links" title="Permalink to this headline">¶</a></h3>
+<p><a class="reference external" href="https://cmiclab.cs.ucl.ac.uk/GIFT-Surg/ImageSplit">Source code repository</a>
+<a class="reference external" href="https://imagesplit.readthedocs.io">Documentation</a></p>
+<div class="section" id="licensing-and-copyright">
+<h4>Licensing and copyright<a class="headerlink" href="#licensing-and-copyright" title="Permalink to this headline">¶</a></h4>
+<p>ImageSplit is released under the BSD-3 licence. Please see the <a class="reference external" href="https://cmiclab.cs.ucl.ac.uk/GIFT-Surg/ImageSplit/blob/master/LICENSE">license file</a> for details.</p>
+</div>
+</div>
+</div>
+<div class="section" id="acknowledgements">
+<h2>Acknowledgements<a class="headerlink" href="#acknowledgements" title="Permalink to this headline">¶</a></h2>
+<p>ImageSplit was originally developed as part of the <a class="reference external" href="https://www.gift-surg.ac.uk">GIFT-Surg</a> project in the <a class="reference external" href="http://cmic.cs.ucl.ac.uk">Centre for Medical Image Computing (CMIC)</a> at <a class="reference external" href="http://www.ucl.ac.uk/">University College London (UCL)</a>.
+Code published prior to September 2018 is Copyright 2017-2018 University College London.</p>
+<p>The GIFT-Surg project is supported by <a class="reference external" href="https://wellcome.ac.uk/">Wellcome</a> and <a class="reference external" href="https://www.epsrc.ac.uk/">EPSRC</a>.</p>
+<div class="section" id="api-reference">
+<h3>API reference<a class="headerlink" href="#api-reference" title="Permalink to this headline">¶</a></h3>
+<p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a>.</p>
+<p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p>
+<p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p>
+<div class="toctree-wrapper compound">
+</div>
+</div>
+</div>
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="#">
+              <img class="logo" src="_static/giftsurg-icon.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="#">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">ImageSplit</a><ul>
+<li><a class="reference internal" href="#installing">Installing</a></li>
+<li><a class="reference internal" href="#example-usage">Example usage</a></li>
+<li><a class="reference internal" href="#detailed-usage">Detailed Usage</a><ul>
+<li><a class="reference internal" href="#contributing">Contributing</a></li>
+<li><a class="reference internal" href="#useful-links">Useful links</a><ul>
+<li><a class="reference internal" href="#licensing-and-copyright">Licensing and copyright</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#acknowledgements">Acknowledgements</a><ul>
+<li><a class="reference internal" href="#api-reference">API reference</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/index.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="#">ImageSplit  documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">ImageSplit</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, UCL.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.5.1.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,276 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>imagesplit.utils.utilities &#8212; ImageSplit  documentation</title>
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/classic.css" type="text/css" />
+    
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">ImageSplit  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">imagesplit.utils.utilities</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for imagesplit.utils.utilities</h1><div class="highlight"><pre>
+<span></span><span class="c1"># coding=utf-8</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Utility files for splitting large images into subimages</span>
+
+<span class="sd">Author: Tom Doel</span>
+<span class="sd">Copyright UCL 2017</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">ceil</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+
+<div class="viewcode-block" id="file_linear_byte_offset"><a class="viewcode-back" href="../../../imagesplit.utils.utilities.html#imagesplit.utils.utilities.file_linear_byte_offset">[docs]</a><span class="k">def</span> <span class="nf">file_linear_byte_offset</span><span class="p">(</span><span class="n">image_size</span><span class="p">,</span> <span class="n">bytes_per_voxel</span><span class="p">,</span> <span class="n">start_coords</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return the file byte offset corresponding to the given coordinates.</span>
+<span class="sd">    Files generally assumed to have the first dimension most rapidly changing</span>
+
+<span class="sd">    Assumes you have a stream of bytes representing a multi-dimensional image,</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">offset</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">offset_multiple</span> <span class="o">=</span> <span class="n">bytes_per_voxel</span>
+    <span class="k">for</span> <span class="n">coord</span><span class="p">,</span> <span class="n">image_length</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">start_coords</span><span class="p">,</span> <span class="n">image_size</span><span class="p">):</span>
+        <span class="n">offset</span> <span class="o">+=</span> <span class="n">coord</span> <span class="o">*</span> <span class="n">offset_multiple</span>
+        <span class="n">offset_multiple</span> <span class="o">*=</span> <span class="n">image_length</span>
+    <span class="k">return</span> <span class="n">offset</span></div>
+
+
+<div class="viewcode-block" id="get_number_of_blocks"><a class="viewcode-back" href="../../../imagesplit.utils.utilities.html#imagesplit.utils.utilities.get_number_of_blocks">[docs]</a><span class="k">def</span> <span class="nf">get_number_of_blocks</span><span class="p">(</span><span class="n">image_size</span><span class="p">,</span> <span class="n">max_block_size</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns a list containing the number of blocks in each dimension</span>
+<span class="sd">    required to split the image into blocks that are subject to a maximum</span>
+<span class="sd">    size limit &quot;&quot;&quot;</span>
+
+    <span class="k">return</span> <span class="p">[</span><span class="mi">1</span> <span class="k">if</span> <span class="n">max_block_size_element</span> <span class="o">&lt;=</span> <span class="mi">0</span> <span class="k">else</span>
+            <span class="nb">int</span><span class="p">(</span><span class="n">ceil</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">image_size_element</span><span class="p">)</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">max_block_size_element</span><span class="p">)))</span>
+            <span class="k">for</span> <span class="n">image_size_element</span><span class="p">,</span> <span class="n">max_block_size_element</span> <span class="ow">in</span>
+            <span class="nb">zip</span><span class="p">(</span><span class="n">image_size</span><span class="p">,</span> <span class="n">max_block_size</span><span class="p">)]</span></div>
+
+
+<div class="viewcode-block" id="get_block_coordinate_range"><a class="viewcode-back" href="../../../imagesplit.utils.utilities.html#imagesplit.utils.utilities.get_block_coordinate_range">[docs]</a><span class="k">def</span> <span class="nf">get_block_coordinate_range</span><span class="p">(</span><span class="n">block_number</span><span class="p">,</span> <span class="n">block_size</span><span class="p">,</span> <span class="n">overlap_size</span><span class="p">,</span>
+                               <span class="n">image_size</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns the minimum and maximum coordinate values in one dimension for</span>
+<span class="sd">    an image block, where the dimension length image_size is to be split into</span>
+<span class="sd">    the number of blocks specified by block_size with an overlap of</span>
+<span class="sd">    overlap_size voxels at each boundary, and the current block_number is</span>
+<span class="sd">    specified. There is no overlap at the outer border of the image, and the</span>
+<span class="sd">    length of the final block is reduced if necessary so there is no padding</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Compute the minimum coordinate of the block</span>
+    <span class="k">if</span> <span class="n">block_number</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">min_coord</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">start_border</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">min_coord</span> <span class="o">=</span> <span class="n">block_number</span> <span class="o">*</span> <span class="n">block_size</span> <span class="o">-</span> <span class="n">overlap_size</span>
+        <span class="n">start_border</span> <span class="o">=</span> <span class="n">overlap_size</span>
+
+    <span class="c1"># Compute the maximum coordinate of the block</span>
+    <span class="n">end_border</span> <span class="o">=</span> <span class="n">overlap_size</span>
+    <span class="n">max_coord</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">block_number</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">block_size</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">overlap_size</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">max_coord</span> <span class="o">&gt;=</span> <span class="n">image_size</span><span class="p">:</span>
+        <span class="n">max_coord</span> <span class="o">=</span> <span class="n">image_size</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="n">end_border</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">return</span> <span class="p">[</span><span class="n">min_coord</span><span class="p">,</span> <span class="n">max_coord</span><span class="p">,</span> <span class="n">start_border</span><span class="p">,</span> <span class="n">end_border</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="get_suggested_block_size"><a class="viewcode-back" href="../../../imagesplit.utils.utilities.html#imagesplit.utils.utilities.get_suggested_block_size">[docs]</a><span class="k">def</span> <span class="nf">get_suggested_block_size</span><span class="p">(</span><span class="n">image_size</span><span class="p">,</span> <span class="n">number_of_blocks</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns a recommended block size (a list of the number of blocks in</span>
+<span class="sd">    each dimension) to allow the specified image_size to be split into the</span>
+<span class="sd">    specified number of blocks in each dimension, with each block being</span>
+<span class="sd">    roughly equal in size &quot;&quot;&quot;</span>
+
+    <span class="k">return</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">ceil</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">image_size_element</span><span class="p">)</span> <span class="o">/</span>
+                     <span class="nb">float</span><span class="p">(</span><span class="n">number_of_blocks_element</span><span class="p">)))</span>
+            <span class="k">for</span> <span class="n">image_size_element</span><span class="p">,</span> <span class="n">number_of_blocks_element</span> <span class="ow">in</span>
+            <span class="nb">zip</span><span class="p">(</span><span class="n">image_size</span><span class="p">,</span> <span class="n">number_of_blocks</span><span class="p">)]</span></div>
+
+
+<div class="viewcode-block" id="ranges_for_max_block_size"><a class="viewcode-back" href="../../../imagesplit.utils.utilities.html#imagesplit.utils.utilities.ranges_for_max_block_size">[docs]</a><span class="k">def</span> <span class="nf">ranges_for_max_block_size</span><span class="p">(</span><span class="n">image_size</span><span class="p">,</span> <span class="n">max_block_size</span><span class="p">,</span> <span class="n">overlap_size</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns a list of ranges, where each recommended block size (a list of</span>
+<span class="sd">    the number of blocks in each dimension) is set such that no block exceeds</span>
+<span class="sd">    the specified maximum size, and the specified image_size</span>
+<span class="sd">    is split so that each block is roughly equal in size &quot;&quot;&quot;</span>
+
+    <span class="n">number_of_blocks</span> <span class="o">=</span> <span class="n">get_number_of_blocks</span><span class="p">(</span><span class="n">image_size</span><span class="p">,</span> <span class="n">max_block_size</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ranges_for_number_of_blocks</span><span class="p">(</span><span class="n">image_size</span><span class="p">,</span> <span class="n">number_of_blocks</span><span class="p">,</span>
+                                       <span class="n">overlap_size</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ranges_for_number_of_blocks"><a class="viewcode-back" href="../../../imagesplit.utils.utilities.html#imagesplit.utils.utilities.ranges_for_number_of_blocks">[docs]</a><span class="k">def</span> <span class="nf">ranges_for_number_of_blocks</span><span class="p">(</span><span class="n">image_size</span><span class="p">,</span> <span class="n">number_of_blocks</span><span class="p">,</span> <span class="n">overlap_size</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns a list of ranges, where each recommended block size (a list of</span>
+<span class="sd">    the number of blocks in each dimension) is set to allow the specified</span>
+<span class="sd">    image_size to be split into the specified number of blocks in each</span>
+<span class="sd">    dimension, with each block being roughly equal in size &quot;&quot;&quot;</span>
+
+    <span class="n">suggested_block_size</span> <span class="o">=</span> <span class="n">get_suggested_block_size</span><span class="p">(</span><span class="n">image_size</span><span class="p">,</span>
+                                                    <span class="n">number_of_blocks</span><span class="p">)</span>
+    <span class="n">block_ranges</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">number_of_blocks</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">number_of_blocks</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">number_of_blocks</span><span class="p">[</span><span class="mi">2</span><span class="p">]):</span>
+                <span class="n">block_ranges</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="p">[</span><span class="n">get_block_coordinate_range</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">block</span><span class="p">,</span> <span class="n">overlap</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span>
+                     <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">block</span><span class="p">,</span> <span class="n">overlap</span><span class="p">,</span> <span class="n">size</span> <span class="ow">in</span>
+                     <span class="nb">zip</span><span class="p">([</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">],</span> <span class="n">suggested_block_size</span><span class="p">,</span> <span class="n">overlap_size</span><span class="p">,</span>
+                         <span class="n">image_size</span><span class="p">)])</span>
+    <span class="k">return</span> <span class="n">block_ranges</span></div>
+
+
+<div class="viewcode-block" id="convert_to_array"><a class="viewcode-back" href="../../../imagesplit.utils.utilities.html#imagesplit.utils.utilities.convert_to_array">[docs]</a><span class="k">def</span> <span class="nf">convert_to_array</span><span class="p">(</span><span class="n">scalar_or_list</span><span class="p">,</span> <span class="n">parameter_name</span><span class="p">,</span> <span class="n">num_dims</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Converts a list or scalar to an array&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">scalar_or_list</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="n">array</span> <span class="o">=</span> <span class="p">[</span><span class="n">scalar_or_list</span><span class="p">]</span> <span class="o">*</span> <span class="n">num_dims</span>
+    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">scalar_or_list</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">array</span> <span class="o">=</span> <span class="n">scalar_or_list</span> <span class="o">*</span> <span class="n">num_dims</span>
+    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">scalar_or_list</span><span class="p">)</span> <span class="o">==</span> <span class="n">num_dims</span><span class="p">:</span>
+        <span class="n">array</span> <span class="o">=</span> <span class="n">scalar_or_list</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s1">&#39;The &#39;</span> <span class="o">+</span> <span class="n">parameter_name</span> <span class="o">+</span> <span class="s1">&#39;parameter must be a scalar, or a list &#39;</span>
+                                      <span class="s1">&#39;containing one entry for &#39;</span>
+                                      <span class="s1">&#39;each image dimension&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">array</span></div>
+
+
+<div class="viewcode-block" id="rescale_image"><a class="viewcode-back" href="../../../imagesplit.utils.utilities.html#imagesplit.utils.utilities.rescale_image">[docs]</a><span class="k">def</span> <span class="nf">rescale_image</span><span class="p">(</span><span class="n">data_type</span><span class="p">,</span> <span class="n">image_line</span><span class="p">,</span> <span class="n">rescale_limits</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Rescale image to the limits of this datatype&quot;&quot;&quot;</span>
+    <span class="n">dt_min</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">iinfo</span><span class="p">(</span><span class="n">data_type</span><span class="p">)</span><span class="o">.</span><span class="n">min</span>
+    <span class="n">dt_max</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">iinfo</span><span class="p">(</span><span class="n">data_type</span><span class="p">)</span><span class="o">.</span><span class="n">max</span>
+    <span class="n">dt_range</span> <span class="o">=</span> <span class="n">dt_max</span> <span class="o">-</span> <span class="n">dt_min</span>
+    <span class="n">im_range</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">rescale_limits</span><span class="o">.</span><span class="n">max</span><span class="p">)</span> <span class="o">-</span> <span class="nb">float</span><span class="p">(</span><span class="n">rescale_limits</span><span class="o">.</span><span class="n">min</span><span class="p">)</span>
+    <span class="n">scale</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">dt_range</span><span class="p">)</span><span class="o">/</span><span class="nb">float</span><span class="p">(</span><span class="n">im_range</span><span class="p">)</span>
+    <span class="n">image_line</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">image_line</span><span class="p">,</span>
+                         <span class="n">a_min</span><span class="o">=</span><span class="n">rescale_limits</span><span class="o">.</span><span class="n">min</span><span class="p">,</span> <span class="n">a_max</span><span class="o">=</span><span class="n">rescale_limits</span><span class="o">.</span><span class="n">max</span><span class="p">)</span>
+    <span class="n">image_line</span> <span class="o">=</span> <span class="n">dt_min</span> <span class="o">+</span> <span class="n">scale</span><span class="o">*</span><span class="p">(</span><span class="n">image_line</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span> <span class="o">-</span> <span class="n">rescale_limits</span><span class="o">.</span><span class="n">min</span><span class="p">)</span>
+    <span class="n">image_line</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">around</span><span class="p">(</span><span class="n">image_line</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">data_type</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">image_line</span></div>
+
+
+<div class="viewcode-block" id="compute_bytes_per_voxel"><a class="viewcode-back" href="../../../imagesplit.utils.utilities.html#imagesplit.utils.utilities.compute_bytes_per_voxel">[docs]</a><span class="k">def</span> <span class="nf">compute_bytes_per_voxel</span><span class="p">(</span><span class="n">element_type</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns number of bytes required to store one voxel for the given</span>
+<span class="sd">    metaIO ElementType &quot;&quot;&quot;</span>
+
+    <span class="n">switcher</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;MET_CHAR&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="s1">&#39;MET_UCHAR&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="s1">&#39;MET_SHORT&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+        <span class="s1">&#39;MET_USHORT&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+        <span class="s1">&#39;MET_INT&#39;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+        <span class="s1">&#39;MET_UINT&#39;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+        <span class="s1">&#39;MET_LONG&#39;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+        <span class="s1">&#39;MET_ULONG&#39;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+        <span class="s1">&#39;MET_LONG_LONG&#39;</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span>
+        <span class="s1">&#39;MET_ULONG_LONG&#39;</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span>
+        <span class="s1">&#39;MET_FLOAT&#39;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+        <span class="s1">&#39;MET_DOUBLE&#39;</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="n">switcher</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">element_type</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="to_rgb"><a class="viewcode-back" href="../../../imagesplit.utils.utilities.html#imagesplit.utils.utilities.to_rgb">[docs]</a><span class="k">def</span> <span class="nf">to_rgb</span><span class="p">(</span><span class="n">image_line</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Convert greyscale array to RGB&quot;&quot;&quot;</span>
+    <span class="n">image_line</span> <span class="o">=</span> <span class="n">image_line</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">image_line</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="n">image_line</span><span class="o">.</span><span class="n">shape</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span><span class="p">,))</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">image_line</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">),</span> <span class="mi">3</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">image_line</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_numpy_datatype"><a class="viewcode-back" href="../../../imagesplit.utils.utilities.html#imagesplit.utils.utilities.get_numpy_datatype">[docs]</a><span class="k">def</span> <span class="nf">get_numpy_datatype</span><span class="p">(</span><span class="n">element_type</span><span class="p">,</span> <span class="n">byte_order_msb</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns the numpy datatype corresponding to this ElementType&quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">byte_order_msb</span> <span class="ow">and</span> <span class="p">(</span><span class="n">byte_order_msb</span> <span class="ow">or</span> <span class="n">byte_order_msb</span> <span class="o">==</span> <span class="s2">&quot;True&quot;</span><span class="p">):</span>
+        <span class="n">prefix</span> <span class="o">=</span> <span class="s1">&#39;&gt;&#39;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">prefix</span> <span class="o">=</span> <span class="s1">&#39;&lt;&#39;</span>
+    <span class="n">switcher</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;MET_CHAR&#39;</span><span class="p">:</span> <span class="s1">&#39;i1&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;MET_UCHAR&#39;</span><span class="p">:</span> <span class="s1">&#39;u1&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;MET_SHORT&#39;</span><span class="p">:</span> <span class="s1">&#39;i2&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;MET_USHORT&#39;</span><span class="p">:</span> <span class="s1">&#39;u2&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;MET_INT&#39;</span><span class="p">:</span> <span class="s1">&#39;i4&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;MET_UINT&#39;</span><span class="p">:</span> <span class="s1">&#39;u4&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;MET_LONG&#39;</span><span class="p">:</span> <span class="s1">&#39;i4&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;MET_ULONG&#39;</span><span class="p">:</span> <span class="s1">&#39;u4&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;MET_LONG_LONG&#39;</span><span class="p">:</span> <span class="s1">&#39;i8&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;MET_ULONG_LONG&#39;</span><span class="p">:</span> <span class="s1">&#39;u8&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;MET_FLOAT&#39;</span><span class="p">:</span> <span class="s1">&#39;f4&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;MET_DOUBLE&#39;</span><span class="p">:</span> <span class="s1">&#39;f8&#39;</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="n">prefix</span> <span class="o">+</span> <span class="n">switcher</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">element_type</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../../index.html">
+              <img class="logo" src="../../../_static/giftsurg-icon.png" alt="Logo"/>
+            </a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">ImageSplit  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">imagesplit.utils.utilities</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, UCL.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.5.1.
+    </div>
+  </body>
+</html>

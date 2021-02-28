@@ -1,0 +1,7 @@
+imagesplit.image.combined\_image module
+=======================================
+
+.. automodule:: imagesplit.image.combined_image
+   :members:
+   :undoc-members:
+   :show-inheritance:

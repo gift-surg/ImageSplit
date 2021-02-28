@@ -1,0 +1,202 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>imagesplit.file.file_wrapper &#8212; ImageSplit  documentation</title>
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/classic.css" type="text/css" />
+    
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">ImageSplit  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">imagesplit.file.file_wrapper</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for imagesplit.file.file_wrapper</h1><div class="highlight"><pre>
+<span></span><span class="c1"># coding=utf-8</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Wrapping code for managing virtual images that may consist of multiple</span>
+<span class="sd">subimages</span>
+
+<span class="sd">Author: Tom Doel</span>
+<span class="sd">Copyright UCL 2017</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">imagesplit.utils.utilities</span> <span class="kn">import</span> <span class="n">file_linear_byte_offset</span><span class="p">,</span> <span class="n">rescale_image</span>
+
+
+<div class="viewcode-block" id="FileStreamer"><a class="viewcode-back" href="../../../imagesplit.file.file_wrapper.html#imagesplit.file.file_wrapper.FileStreamer">[docs]</a><span class="k">class</span> <span class="nc">FileStreamer</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Handle streaming of image data with arbitrarily large files&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_wrapper</span><span class="p">,</span> <span class="n">image_size</span><span class="p">,</span> <span class="n">bytes_per_voxel</span><span class="p">,</span> <span class="n">numpy_format</span><span class="p">,</span>
+                 <span class="n">dimension_ordering</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_bytes_per_voxel</span> <span class="o">=</span> <span class="n">bytes_per_voxel</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_image_size</span> <span class="o">=</span> <span class="n">image_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_file_wrapper</span> <span class="o">=</span> <span class="n">file_wrapper</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_numpy_format</span> <span class="o">=</span> <span class="n">numpy_format</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dimension_ordering</span> <span class="o">=</span> <span class="n">dimension_ordering</span>
+
+<div class="viewcode-block" id="FileStreamer.read_line"><a class="viewcode-back" href="../../../imagesplit.file.file_wrapper.html#imagesplit.file.file_wrapper.FileStreamer.read_line">[docs]</a>    <span class="k">def</span> <span class="nf">read_line</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start_coords</span><span class="p">,</span> <span class="n">num_voxels</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Read a line of image data from a binary file at the specified</span>
+<span class="sd">        image location &quot;&quot;&quot;</span>
+
+        <span class="n">offset</span> <span class="o">=</span> <span class="n">file_linear_byte_offset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_image_size</span><span class="p">,</span>
+                                         <span class="bp">self</span><span class="o">.</span><span class="n">_bytes_per_voxel</span><span class="p">,</span>
+                                         <span class="n">start_coords</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_file_wrapper</span><span class="o">.</span><span class="n">get_handle</span><span class="p">()</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">offset</span><span class="p">)</span>
+
+        <span class="n">data_type</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_numpy_format</span><span class="p">)</span>
+        <span class="n">bytes_array</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file_wrapper</span><span class="o">.</span><span class="n">get_handle</span><span class="p">()</span><span class="o">.</span><span class="n">read</span><span class="p">(</span>
+            <span class="n">num_voxels</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bytes_per_voxel</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">frombuffer</span><span class="p">(</span><span class="n">bytes_array</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">data_type</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="FileStreamer.write_line"><a class="viewcode-back" href="../../../imagesplit.file.file_wrapper.html#imagesplit.file.file_wrapper.FileStreamer.write_line">[docs]</a>    <span class="k">def</span> <span class="nf">write_line</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start_coords</span><span class="p">,</span> <span class="n">image_line</span><span class="p">,</span> <span class="n">rescale_limits</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Write a line of image data to a binary file at the specified image</span>
+<span class="sd">        location &quot;&quot;&quot;</span>
+
+        <span class="n">offset</span> <span class="o">=</span> <span class="n">file_linear_byte_offset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_image_size</span><span class="p">,</span>
+                                         <span class="bp">self</span><span class="o">.</span><span class="n">_bytes_per_voxel</span><span class="p">,</span>
+                                         <span class="n">start_coords</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_file_wrapper</span><span class="o">.</span><span class="n">get_handle</span><span class="p">()</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">offset</span><span class="p">)</span>
+
+        <span class="n">data_type</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_numpy_format</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">rescale_limits</span><span class="p">:</span>
+            <span class="n">image_line</span> <span class="o">=</span> <span class="n">rescale_image</span><span class="p">(</span><span class="n">data_type</span><span class="p">,</span> <span class="n">image_line</span><span class="p">,</span>
+                                       <span class="n">rescale_limits</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_file_wrapper</span><span class="o">.</span><span class="n">get_handle</span><span class="p">()</span><span class="o">.</span><span class="n">write</span><span class="p">(</span>
+            <span class="n">image_line</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">data_type</span><span class="p">)</span><span class="o">.</span><span class="n">tobytes</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="FileStreamer.close"><a class="viewcode-back" href="../../../imagesplit.file.file_wrapper.html#imagesplit.file.file_wrapper.FileStreamer.close">[docs]</a>    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Close any files that have been opened.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_file_wrapper</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div></div>
+
+
+<div class="viewcode-block" id="FileWrapper"><a class="viewcode-back" href="../../../imagesplit.file.file_wrapper.html#imagesplit.file.file_wrapper.FileWrapper">[docs]</a><span class="k">class</span> <span class="nc">FileWrapper</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Read or write to arbitrarily large files.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">file_handle_factory</span><span class="p">,</span> <span class="n">mode</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_file_handle_factory</span> <span class="o">=</span> <span class="n">file_handle_factory</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_filename</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_mode</span> <span class="o">=</span> <span class="n">mode</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_file_handle</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="fm">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">open</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file_handle</span>
+
+    <span class="k">def</span> <span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exit_type</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">traceback</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+<div class="viewcode-block" id="FileWrapper.get_handle"><a class="viewcode-back" href="../../../imagesplit.file.file_wrapper.html#imagesplit.file.file_wrapper.FileWrapper.get_handle">[docs]</a>    <span class="k">def</span> <span class="nf">get_handle</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the file handle, opening if necessary&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file_handle</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">open</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file_handle</span></div>
+
+<div class="viewcode-block" id="FileWrapper.open"><a class="viewcode-back" href="../../../imagesplit.file.file_wrapper.html#imagesplit.file.file_wrapper.FileWrapper.open">[docs]</a>    <span class="k">def</span> <span class="nf">open</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Opens the file&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_file_handle</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file_handle_factory</span><span class="o">.</span><span class="n">create_file_handle</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_filename</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mode</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="FileWrapper.close"><a class="viewcode-back" href="../../../imagesplit.file.file_wrapper.html#imagesplit.file.file_wrapper.FileWrapper.close">[docs]</a>    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Close the file&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file_handle</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file_handle</span><span class="o">.</span><span class="n">closed</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_file_handle</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_file_handle</span> <span class="o">=</span> <span class="kc">None</span></div></div>
+
+
+<div class="viewcode-block" id="FileHandleFactory"><a class="viewcode-back" href="../../../imagesplit.file.file_wrapper.html#imagesplit.file.file_wrapper.FileHandleFactory">[docs]</a><span class="k">class</span> <span class="nc">FileHandleFactory</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Creates file handles, allowing for abstraction to virtual files&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+<div class="viewcode-block" id="FileHandleFactory.create_file_handle"><a class="viewcode-back" href="../../../imagesplit.file.file_wrapper.html#imagesplit.file.file_wrapper.FileHandleFactory.create_file_handle">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">create_file_handle</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">mode</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create and open a real file with this path and file access mode&quot;&quot;&quot;</span>
+        <span class="n">folder</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">folder</span><span class="p">):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">folder</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">mode</span><span class="p">)</span></div></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../../index.html">
+              <img class="logo" src="../../../_static/giftsurg-icon.png" alt="Logo"/>
+            </a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">ImageSplit  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">imagesplit.file.file_wrapper</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, UCL.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.5.1.
+    </div>
+  </body>
+</html>

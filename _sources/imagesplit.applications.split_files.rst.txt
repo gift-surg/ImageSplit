@@ -1,0 +1,7 @@
+imagesplit.applications.split\_files module
+===========================================
+
+.. automodule:: imagesplit.applications.split_files
+   :members:
+   :undoc-members:
+   :show-inheritance:

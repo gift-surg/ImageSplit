@@ -1,0 +1,7 @@
+imagesplit.file.file\_factory module
+====================================
+
+.. automodule:: imagesplit.file.file_factory
+   :members:
+   :undoc-members:
+   :show-inheritance:

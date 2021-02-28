@@ -1,0 +1,192 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>imagesplit.file.vol_reader module &#8212; ImageSplit  documentation</title>
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">ImageSplit  documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">imagesplit.file.vol_reader module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-imagesplit.file.vol_reader">
+<span id="imagesplit-file-vol-reader-module"></span><h1>imagesplit.file.vol_reader module<a class="headerlink" href="#module-imagesplit.file.vol_reader" title="Permalink to this headline">¶</a></h1>
+<p>Utility for reading and writing data to metaio (mhd/mha) files</p>
+<p>Author: Tom Doel
+Copyright UCL 2017</p>
+<dl class="py class">
+<dt id="imagesplit.file.vol_reader.VolFile">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">imagesplit.file.vol_reader.</span></code><code class="sig-name descname"><span class="pre">VolFile</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">local_image_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">header_filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_handle_factory</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/file/vol_reader.html#VolFile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.file.vol_reader.VolFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="imagesplit.file.image_file_reader.html#imagesplit.file.image_file_reader.LinearImageFileReader" title="imagesplit.file.image_file_reader.LinearImageFileReader"><code class="xref py py-class docutils literal notranslate"><span class="pre">imagesplit.file.image_file_reader.LinearImageFileReader</span></code></a></p>
+<p>A class for reading or writing 3D imaging data to/from a MetaIO file
+pair (.mhd and .raw).</p>
+<dl class="py method">
+<dt id="imagesplit.file.vol_reader.VolFile.close">
+<code class="sig-name descname"><span class="pre">close</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/file/vol_reader.html#VolFile.close"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.file.vol_reader.VolFile.close" title="Permalink to this definition">¶</a></dt>
+<dd><p>Close the files associated with this image, if they are not
+already closed.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="imagesplit.file.vol_reader.VolFile.close_file">
+<code class="sig-name descname"><span class="pre">close_file</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/file/vol_reader.html#VolFile.close_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.file.vol_reader.VolFile.close_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Close file</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="imagesplit.file.vol_reader.VolFile.create_read_file">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">create_read_file</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subimage_descriptor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_handle_factory</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/file/vol_reader.html#VolFile.create_read_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.file.vol_reader.VolFile.create_read_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a MetaIoFile class for writing</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="imagesplit.file.vol_reader.VolFile.get_bytes_per_voxel">
+<code class="sig-name descname"><span class="pre">get_bytes_per_voxel</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/file/vol_reader.html#VolFile.get_bytes_per_voxel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.file.vol_reader.VolFile.get_bytes_per_voxel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the number of bytes used to represent a single voxel in
+this image.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="imagesplit.file.vol_reader.VolFile.get_dimension_ordering">
+<code class="sig-name descname"><span class="pre">get_dimension_ordering</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/file/vol_reader.html#VolFile.get_dimension_ordering"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.file.vol_reader.VolFile.get_dimension_ordering" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the preferred dimension ordering for writing data.</p>
+<p>Returns an array of 3 element, where each element represents a
+dimension in the global coordinate system numbered from 1 to 3 and
+is positive if data are to be written in ascending coordinates (in
+the global system) or negative if to be written in descending global
+coordinates along that dimension</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="imagesplit.file.vol_reader.VolFile.load_and_parse_header">
+<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">load_and_parse_header</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/file/vol_reader.html#VolFile.load_and_parse_header"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.file.vol_reader.VolFile.load_and_parse_header" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load vge header file and parse into FileImageDescriptor</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="imagesplit.file.vol_reader.VolFile.read_line">
+<code class="sig-name descname"><span class="pre">read_line</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start_coords</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_voxels_to_read</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/file/vol_reader.html#VolFile.read_line"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.file.vol_reader.VolFile.read_line" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read consecutive voxels of image data from the raw binary file
+starting at the specified coordinates.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="imagesplit.file.vol_reader.VolFile.write_line">
+<code class="sig-name descname"><span class="pre">write_line</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start_coords</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_line</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rescale_limits</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/file/vol_reader.html#VolFile.write_line"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.file.vol_reader.VolFile.write_line" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write consecutive voxels to the raw binary file.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt id="imagesplit.file.vol_reader.compute_bytes_per_voxel">
+<code class="sig-prename descclassname"><span class="pre">imagesplit.file.vol_reader.</span></code><code class="sig-name descname"><span class="pre">compute_bytes_per_voxel</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_data_type</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/file/vol_reader.html#compute_bytes_per_voxel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.file.vol_reader.compute_bytes_per_voxel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns number of bytes required to store one voxel for the given
+ElementType</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="imagesplit.file.vol_reader.dim_order_from_header">
+<code class="sig-prename descclassname"><span class="pre">imagesplit.file.vol_reader.</span></code><code class="sig-name descname"><span class="pre">dim_order_from_header</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">header</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/file/vol_reader.html#dim_order_from_header"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.file.vol_reader.dim_order_from_header" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the order in which dimensions are stored in the global system.
+The first element in the array contains the index of the global dimension
+which is represented by the first dimension in the file, and so on</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="imagesplit.file.vol_reader.get_numpy_datatype">
+<code class="sig-prename descclassname"><span class="pre">imagesplit.file.vol_reader.</span></code><code class="sig-name descname"><span class="pre">get_numpy_datatype</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">element_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">endian</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/file/vol_reader.html#get_numpy_datatype"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.file.vol_reader.get_numpy_datatype" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the numpy datatype corresponding to this ElementType</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="imagesplit.file.vol_reader.load_vge_header">
+<code class="sig-prename descclassname"><span class="pre">imagesplit.file.vol_reader.</span></code><code class="sig-name descname"><span class="pre">load_vge_header</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/file/vol_reader.html#load_vge_header"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.file.vol_reader.load_vge_header" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load vge as an ini file</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="imagesplit.file.vol_reader.parse_vge">
+<code class="sig-prename descclassname"><span class="pre">imagesplit.file.vol_reader.</span></code><code class="sig-name descname"><span class="pre">parse_vge</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">header</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imagesplit/file/vol_reader.html#parse_vge"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imagesplit.file.vol_reader.parse_vge" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse vge header file</p>
+</dd></dl>
+
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/giftsurg-icon.png" alt="Logo"/>
+            </a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/imagesplit.file.vol_reader.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">ImageSplit  documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">imagesplit.file.vol_reader module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, UCL.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.5.1.
+    </div>
+  </body>
+</html>
