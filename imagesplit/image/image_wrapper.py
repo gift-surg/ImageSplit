@@ -127,12 +127,12 @@ class ImageStorage(object):
     def set(self, selector, image):
         """Replaces part of the image data using the specified selectors"""
 
-        self._numpy_image[list(reversed(selector))] = image.get_raw()
+        self._numpy_image[tuple(list(reversed(selector)))] = image.get_raw()
 
     def get(self, selector):
         """Returns part of the image data using the specified selectors"""
 
-        return ImageStorage(self._numpy_image[list(reversed(selector))])
+        return ImageStorage(self._numpy_image[tuple(list(reversed(selector)))])
 
     def get_size(self):
         """Returns the image size in the global dimension ordering scheme"""
