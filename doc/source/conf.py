@@ -31,7 +31,7 @@ root_dir_rel = os.path.join('..', '..')
 root_dir_abs = os.path.abspath(root_dir_rel)
 module_path = root_dir_abs
 sys.path.insert(0, module_path)
-logo_file = 'giftsurg-icon.png'
+logo_file = 'project-icon.png'
 static_images_folder = 'images'
 logo_path = os.path.join('..', '..', logo_file)
 
