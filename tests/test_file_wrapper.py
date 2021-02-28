@@ -252,7 +252,7 @@ class TestStreamer(fake_filesystem_unittest.TestCase):
                     (float(rescale_limits.max) - float(rescale_limits.min))
 
             expected_rescaled = np.around(offset +
-                scale*(expected_clipped.astype(np.float)
+                scale*(expected_clipped.astype(np.float64)
                        - float(rescale_limits.min))).astype(expected.dtype)
         else:
             expected_rescaled = expected
