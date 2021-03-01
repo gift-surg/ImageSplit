@@ -206,7 +206,7 @@ The GIFT-Surg project is supported by `Wellcome`_ and `EPSRC`_.
 
 .. _`Source code`: https://github.com/tomdoel/ImageSplit
 .. _`Documentation`: https://tomdoel.github.io/ImageSplit/
-.. _`PyPi`: https://pypi.org/project/copyxnat
+.. _`PyPi`: https://pypi.org/project/imagesplit
 .. _`license file`: https://github.com/tomdoel/ImageSplit/blob/master/LICENSE
 .. _`University College London (UCL)`: http://www.ucl.ac.uk/
 .. _`Centre for Medical Image Computing (CMIC)`: http://cmic.cs.ucl.ac.uk
