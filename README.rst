@@ -179,13 +179,14 @@ Help and testing:
 Useful links
 ^^^^^^^^^^^^
 
-`Source code`_
-`Documentation`_
-`PyPi`_
+    * `Source code`_
+    * `GutHub Documentation`_
+    * `Read The Docs`_
+    * `PyPi`_
 
 
 Licensing
----------
+^^^^^^^^^
 
 ImageSplit is released under the BSD-3 licence. Please see the `license file`_ for details.
 
@@ -199,7 +200,8 @@ The GIFT-Surg project is supported by `Wellcome`_ and `EPSRC`_.
 
 
 .. _`Source code`: https://github.com/tomdoel/ImageSplit
-.. _`Documentation`: https://tomdoel.github.io/ImageSplit/
+.. _`GutHub Documentation`: https://tomdoel.github.io/ImageSplit/
+.. _`Read The Docs`: https://imagesplit.readthedocs.io/
 .. _`PyPi`: https://pypi.org/project/imagesplit
 .. _`license file`: https://github.com/tomdoel/ImageSplit/blob/master/LICENSE
 .. _`University College London (UCL)`: http://www.ucl.ac.uk/
