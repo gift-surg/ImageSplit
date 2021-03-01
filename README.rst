@@ -176,12 +176,6 @@ Help and testing:
     -h, --help  Show this help message and exit
 
 
-Contributing
-^^^^^^^^^^^^
-
-Please see the `contributing guidelines`_.
-
-
 Useful links
 ^^^^^^^^^^^^
 
