@@ -190,8 +190,8 @@ Useful links
 `PyPi`_
 
 
-Licensing and copyright
------------------------
+Licensing
+---------
 
 ImageSplit is released under the BSD-3 licence. Please see the `license file`_ for details.
 
