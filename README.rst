@@ -14,7 +14,7 @@ ImageSplit
     :target: https://pypi.org/project/imagesplit
     :alt: Package
 
-.. image:: https://github.com/tomdoel/ImageSplit/workflows/package/badge.svg
+.. image:: https://img.shields.io/github/license/tomdoel/imagesplit
     :target: https://github.com/tomdoel/ImageSplit/blob/main/LICENSE
     :alt: Package
 
@@ -185,8 +185,9 @@ Please see the `contributing guidelines`_.
 Useful links
 ^^^^^^^^^^^^
 
-`Source code repository`_
+`Source code`_
 `Documentation`_
+`PyPi`_
 
 
 Licensing and copyright
@@ -198,21 +199,20 @@ Acknowledgements
 ~~~~~~~~~~~~~~~~
 
 ImageSplit was originally developed as part of the `GIFT-Surg`_ project in the `Centre for Medical Image Computing (CMIC)`_ at `University College London (UCL)`_.
-Code published prior to September 2018 is Copyright 2017-2018 University College London.
+Code published prior to September 2018 is Copyright University College London.
 
 The GIFT-Surg project is supported by `Wellcome`_ and `EPSRC`_.
 
 
-.. _`Wellcome EPSRC Centre for Interventional and Surgical Sciences`: http://www.ucl.ac.uk/weiss
-.. _`source code repository`: https://cmiclab.cs.ucl.ac.uk/GIFT-Surg/ImageSplit
-.. _`Documentation`: https://imagesplit.readthedocs.io
+.. _`Source code`: https://github.com/tomdoel/ImageSplit
+.. _`Documentation`: https://tomdoel.github.io/ImageSplit/
+.. _`PyPi`: https://pypi.org/project/copyxnat
+.. _`license file`: https://github.com/tomdoel/ImageSplit/blob/master/LICENSE
 .. _`University College London (UCL)`: http://www.ucl.ac.uk/
 .. _`Centre for Medical Image Computing (CMIC)`: http://cmic.cs.ucl.ac.uk
 .. _`Wellcome`: https://wellcome.ac.uk/
 .. _`GIFT-Surg`: https://www.gift-surg.ac.uk
 .. _`EPSRC`: https://www.epsrc.ac.uk/
-.. _`contributing guidelines`: https://cmiclab.cs.ucl.ac.uk/GIFT-Surg/ImageSplit/blob/master/CONTRIBUTING.rst
-.. _`license file`: https://cmiclab.cs.ucl.ac.uk/GIFT-Surg/ImageSplit/blob/master/LICENSE
 
 
 
